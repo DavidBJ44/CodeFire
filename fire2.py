@@ -3,23 +3,55 @@ import numpy as np
 #sea 1 bosque, 2 cultivo, 3 població, 4 zona segura
 #sea la probabilidad de que el fuego pase de 1 a 1: 0.8, que pase de 1 a 2: 0.7, de 1 a 3: 0.5, de 1 a 4:0, de 2 a 2: 0.5, de 2 a 3: 0.4, de 2 a 4: 0, de 3 a 3: 0.2, de 3 a 4: 0 i de 4 a 4: 0
 
-A = np.array([
-    [1,1,1,2,3],
-    [1,1,4,2,2],
-    [1,1,1,3,3],
-    [1,1,4,3,3],
-    [1,4,2,2,2]
-])
+# Pedir las dimensiones del mapa
+n = int(input("¿Cuántas filas quieres que tenga el mapa? "))
+m = int(input("¿Cuántas columnas quieres que tenga el mapa? "))
+
+# Preguntar si quiere un mapa aleatorio o introducirlo manualmente
+opcion = input("¿Quieres que el mapa sea aleatorio (a) o quieres introducirlo manualmente (m)? (a/m): ").lower()
+
+if opcion == 'a':
+    # Crear mapa aleatorio con valores 1-4 (bosque, cultivo, población, zona segura)
+    A = np.random.randint(1, 5, size=(n, m))
+elif opcion == 'm':
+    # Introducir mapa manualmente
+    A = np.zeros((n, m), dtype=int)
+    print(f"Introduce los valores del mapa {n}x{m} (valores 1-4):")
+    print("Para cada fila, introduce los números encadenados sin espacios (ej: 1234 para una fila de 4 columnas)")
+    for i in range(n):
+        while True:
+            try:
+                fila_str = input(f"Fila {i}: ")
+                # Verificar que la longitud coincida
+                if len(fila_str) != m:
+                    print(f"Error: debes introducir exactamente {m} números")
+                    continue
+                # Verificar que todos sean números del 1 al 4
+                if not all(c in '1234' for c in fila_str):
+                    print("Error: solo se aceptan números del 1 al 4")
+                    continue
+                # Convertir a números y asignar a la fila
+                for j, valor_str in enumerate(fila_str):
+                    A[i, j] = int(valor_str)
+                break
+            except ValueError:
+                print("Error: introduce solo números encadenados")
+else:
+    print("Error: opción no válida")
+    exit()
+
+# Pedir coordenadas del fuego inicial
+x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
+y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
+
+# Validar que las coordenadas están dentro del rango
+if not (0 <= x < n and 0 <= y < m):
+    print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
+    exit()
 
 #1 significa que hay fuego i 0 significa que no.
-
-F_0 = np.array([
-    [1,0,0,0,0],
-    [0,0,0,0,0],
-    [0,0,0,0,0],
-    [0,0,0,0,0],
-    [0,0,0,0,0]
-])
+F_0 = np.zeros((n, m), dtype=int)
+F_0[x, y] = 1
 
 # Matriz de probabilidades de propagación del fuego
 # probabilidades[terreno_origen][terreno_destino] = probabilidad
