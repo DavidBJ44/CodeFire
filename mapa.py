@@ -2,58 +2,83 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.patches as mpatches
 import numpy as np
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+import re
+import os
 
-# 1. Definición de la configuración de tipos de suelo
-# Aquí asociamos cada letra a un número, un color y un nombre
-suelos_info = {
-    'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray'},
-    'b': {'id': 1, 'label': 'Bosque', 'color': 'forestgreen'},
-    'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold'},
-    's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue'},
-    'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black'},
-    'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'} # Opcional, por si lo necesitas
-}
+def generar_video_incendio(archivo_txt, nombre_salida):
+    # Asegurarnos de que el nombre tenga una extensión válida
+    if not nombre_salida.endswith(('.mp4')):
+        nombre_salida += ".mp4"
 
-# 2. Tu matriz de ejemplo (puedes sustituirla por la evolución de tu código)
-# Supongamos que esta es la matriz resultante de tu simulación
-mapa_letras = [
-    ['b', 'b', 'b', 's', 's'],
-    ['b', 'f', 'b', 's', 's'],
-    ['c', 'q', 'p', 'p', 'b'],
-    ['c', 'c', 'p', 'p', 'b'],
-    ['s', 's', 'b', 'b', 'b']
-]
+    # 1. Configuración de tipos de suelo
+    suelos_info = {
+        'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray'},
+        'b': {'id': 1, 'label': 'Bosque', 'color': 'forestgreen'},
+        'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold'},
+        's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue'},
+        'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black'},
+        'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'}
+    }
 
-# 3. Convertir matriz de letras a matriz numérica para que Matplotlib la entienda
-filas = len(mapa_letras)
-columnas = len(mapa_letras[0])
-matriz_numerica = np.zeros((filas, columnas))
+    # 2. Leer archivo
+    if not os.path.exists(archivo_txt):
+        print(f"Error: No se encuentra el archivo {archivo_txt}")
+        return
 
-for i in range(filas):
-    for j in range(columnas):
-        letra = mapa_letras[i][j]
-        matriz_numerica[i][j] = suelos_info[letra]['id']
+    with open(archivo_txt, 'r') as f:
+        contenido = f.read().strip()
 
-# 4. Configurar colores para la visualización
-colores_lista = [info['color'] for info in suelos_info.values()]
-cmap_personalizado = mcolors.ListedColormap(colores_lista)
+    bloques_matrices = contenido.split('\n\n')
+    matrices_numericas = []
 
-# 5. Crear la figura
-plt.figure(figsize=(10, 7))
+    for bloque in bloques_matrices:
+        filas_texto = bloque.strip().split('\n')
+        matriz_paso = []
+        for fila in filas_texto:
+            caracteres = re.findall(r'[pbcsvqf]', fila)
+            if caracteres:
+                fila_num = [suelos_info[c]['id'] for c in caracteres]
+                matriz_paso.append(fila_num)
+        
+        if matriz_paso:
+            matrices_numericas.append(np.array(matriz_paso))
 
-# Mostrar la matriz
-# vmin y vmax aseguran que los colores no cambien si falta algún tipo de suelo
-im = plt.imshow(matriz_numerica, cmap=cmap_personalizado, vmin=0, vmax=len(suelos_info)-1)
+    if not matrices_numericas:
+        print("No se encontraron matrices válidas.")
+        return
 
-# Añadir una cuadrícula (grid) para que se vea la división de la matriz
-plt.grid(which='major', axis='both', linestyle='-', color='white', linewidth=1)
-plt.xticks(np.arange(-.5, columnas, 1), []) # Ocultar números de ejes
-plt.yticks(np.arange(-.5, filas, 1), [])
+    filas, columnas = matrices_numericas[0].shape
 
-# 6. CREAR LA LEYENDA PERSONALIZADA
-parches = [mpatches.Patch(color=info['color'], label=info['label']) for info in suelos_info.values()]
-plt.legend(handles=parches, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=12)
+    # 3. Configuración visual
+    colores_lista = [info['color'] for info in suelos_info.values()]
+    cmap_personalizado = mcolors.ListedColormap(colores_lista)
+    
+    fig, ax = plt.subplots(figsize=(10, 7))
+    
+    # Crear la imagen inicial
+    im = ax.imshow(matrices_numericas[0], cmap=cmap_personalizado, vmin=0, vmax=5)
+    ax.grid(which='major', axis='both', linestyle='-', color='white', linewidth=1)
+    ax.set_xticks(np.arange(-.5, columnas, 1))
+    ax.set_yticks(np.arange(-.5, filas, 1))
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    
+    parches = [mpatches.Patch(color=info['color'], label=info['label']) for info in suelos_info.values()]
+    ax.legend(handles=parches, bbox_to_anchor=(1.05, 1), loc='upper left')
 
-plt.title("Simulación de Propagación de Fuego", fontsize=16, pad=20)
-plt.tight_layout() # Para que la leyenda no se corte
-plt.show()
+    def update(frame):
+        ax.set_title(f"Simulación de Propagación de Fuego - Paso {frame}", fontsize=16)
+        im.set_array(matrices_numericas[frame])
+        return [im]
+
+
+    ani = FuncAnimation(fig, update, frames=len(matrices_numericas), interval=1000, blit=False)
+    plt.tight_layout()
+
+    # 4. Guardar directamente como MP4 , libreria ffmpeg
+    print(f"Generando video MP4: {nombre_salida}...")
+    writer = FFMpegWriter(fps=1)
+    ani.save(nombre_salida, writer=writer)
+    print("¡Proceso finalizado con éxito!")
+generar_video_incendio("test2.txt", "videotest2")
