@@ -66,20 +66,34 @@ def calcular_F_1(A):
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
     Parámetros:
-    A: matriz del mapa con el estado inicial del fuego (letras b, c, p, s indicando tipo de terreno, 'f'=fuego)
+    A_original: matriz del mapa inicial (letras b, c, p, s indicando tipo de terreno)
     
     Retorna:
     F_list: lista de matrices del estado del fuego en cada paso temporal
     """
-    F_list = [A.copy()]
-    F_actual = A.copy()
+    n, m = A_original.shape
+    # Pedir coordenadas del fuego inicial
+    x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
+    y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
+    
+    # Validar que las coordenadas están dentro del rango
+    if not (0 <= x < n and 0 <= y < m):
+        print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
+        exit()
+    
+    A = A_original.copy()  # A es el mapa de terrenos
+    F = A.copy()  # F es el estado del fuego
+    F[x, y] = 'f'
+    
+    F_list = [F.copy()]
+    F_actual = F.copy()
     
     while np.any(F_actual == 'f'):
         F_1 = F_actual.copy()
         rows, cols = A.shape
         
         # Direcciones adyacentes (arriba, abajo, izquierda, derecha)
-        direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Incluyendo diagonales
         
         # Para cada celda con fuego en F_actual
         for i in range(rows):
@@ -114,17 +128,17 @@ def calcular_F_1(A):
         F_actual = F_1
         F_list.append(F_actual.copy())
     
-    return F_list
-# Calcular la lista de matrices F desde F_0 hasta que no haya más fuego activo
-F_list = calcular_F_1(A)
-
-# Guardar las matrices en un archivo .txt
-with open('matrices.txt', 'w') as f:
-    f.write(str(A_original))
-    f.write("\n")
+    # Guardar las matrices en un archivo .txt
+    with open('matrices.txt', 'w') as f:
+        f.write(str(A_original))
+        f.write("\n\n")
+        
+        for idx, F in enumerate(F_list):
+            f.write(str(F))
+            f.write("\n\n")
     
-    for idx, F in enumerate(F_list):
-        f.write(str(F))
-        f.write("\n")
+    print("Las matrices se han guardado en 'matrices.txt'")
+     
+calcular_F_1(A)
 
-print("Las matrices se han guardado en 'matrices.txt'")
+
