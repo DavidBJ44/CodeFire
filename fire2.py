@@ -1,6 +1,6 @@
 import numpy as np
 
-def calcular_F_1(A):
+def calcular_F_1(A_original):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
