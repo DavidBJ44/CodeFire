@@ -1,6 +1,13 @@
 from mapa import generar_video_incendio
 from fire2 import calcular_F_1
 import re
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import matplotlib.patches as mpatches
+import numpy as np
+from matplotlib.animation import FuncAnimation, FFMpegWriter
+import re
+import os
 
 # Variable global para "recordar" la matriz
 matriz_guardada = None
@@ -79,4 +86,4 @@ def leerm(nombre_archivo):
 
 leerm("test10x10.txt")
 calcular_F_1 (matriz_guardada)
-generar_video_incendio("1.txt", "prueba1")
+generar_video_incendio("test10.txt", "prueba1")

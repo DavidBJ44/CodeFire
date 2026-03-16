@@ -10,7 +10,14 @@ def calcular_F_1(A_original):
     Retorna:
     F_list: lista de matrices del estado del fuego en cada paso temporal
     """
+    A_original = np.array(A_original)
     n, m = A_original.shape
+    probabilidades = {
+    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
+    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
+    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
+    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0}
+}
     # Pedir coordenadas del fuego inicial
     x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
     y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
