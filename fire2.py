@@ -1,66 +1,5 @@
 import numpy as np
 
-#sea 1 bosque, 2 cultivo, 3 població, 4 zona segura
-#sea la probabilidad de que el fuego pase de 1 a 1: 0.8, que pase de 1 a 2: 0.7, de 1 a 3: 0.5, de 1 a 4:0, de 2 a 2: 0.5, de 2 a 3: 0.4, de 2 a 4: 0, de 3 a 3: 0.2, de 3 a 4: 0 i de 4 a 4: 0
-
-# Pedir las dimensiones del mapa
-n = int(input("¿Cuántas filas quieres que tenga el mapa? "))
-m = int(input("¿Cuántas columnas quieres que tenga el mapa? "))
-
-# Preguntar si quiere un mapa aleatorio o introducirlo manualmente
-opcion = input("¿Quieres que el mapa sea aleatorio (a) o quieres introducirlo manualmente (m)? (a/m): ").lower()
-
-if opcion == 'a':
-    # Crear mapa aleatorio con valores b, c, p, s (bosque, cultivo, población, zona segura)
-    A = np.random.choice(['b', 'c', 'p', 's'], size=(n, m))
-elif opcion == 'm':
-    # Introducir mapa manualmente
-    A = np.empty((n, m), dtype=str)
-    print(f"Introduce los valores del mapa {n}x{m} (valores b, c, p, s, f):")
-    print("Para cada fila, introduce las letras encadenadas sin espacios (ej: bcps para una fila de 4 columnas)")
-    for i in range(n):
-        while True:
-            try:
-                fila_str = input(f"Fila {i}: ")
-                # Verificar que la longitud coincida
-                if len(fila_str) != m:
-                    print(f"Error: debes introducir exactamente {m} letras")
-                    continue
-                # Verificar que todos sean letras válidas
-                if not all(c in 'bcpsf' for c in fila_str):
-                    print("Error: solo se aceptan letras b, c, p, s, f")
-                    continue
-                # Asignar a la fila
-                for j, letra in enumerate(fila_str):
-                    A[i, j] = letra
-                break
-            except ValueError:
-                print("Error: introduce solo letras encadenadas")
-else:
-    print("Error: opción no válida")
-    exit()
-
-A_original = A.copy()
-
-# Matriz de probabilidades de propagación del fuego
-suelos_info = {
-    'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray', 'prob_quemado': 0.1},
-    'b': {'id': 1, 'label': 'Bosque', 'color': 'forestgreen', 'prob_quemado': 0.8},
-    'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold', 'prob_quemado': 0.5},
-    's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue', 'prob_quemado': 0.0},
-    'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black', 'prob_quemado': 0.0},
-    'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red', 'prob_quemado': 1.0}
-}
-
-# Probabilidades de propagación del fuego entre terrenos
-probabilidades = {
-    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0}
-}
-
-
 def calcular_F_1(A):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
@@ -129,7 +68,7 @@ def calcular_F_1(A):
         F_list.append(F_actual.copy())
     
     # Guardar las matrices en un archivo .txt
-    with open('matrices.txt', 'w') as f:
+    with open('test10.txt', 'w') as f:
         f.write(str(A_original))
         f.write("\n\n")
         
@@ -137,8 +76,7 @@ def calcular_F_1(A):
             f.write(str(F))
             f.write("\n\n")
     
-    print("Las matrices se han guardado en 'matrices.txt'")
+    print("Las matrices se han guardado en 'test10.txt'")
      
-calcular_F_1(A)
 
 
