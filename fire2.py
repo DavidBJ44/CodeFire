@@ -11,31 +11,31 @@ m = int(input("¿Cuántas columnas quieres que tenga el mapa? "))
 opcion = input("¿Quieres que el mapa sea aleatorio (a) o quieres introducirlo manualmente (m)? (a/m): ").lower()
 
 if opcion == 'a':
-    # Crear mapa aleatorio con valores 1-4 (bosque, cultivo, población, zona segura)
-    A = np.random.randint(1, 5, size=(n, m))
+    # Crear mapa aleatorio con valores b, c, p, s (bosque, cultivo, población, zona segura)
+    A = np.random.choice(['b', 'c', 'p', 's'], size=(n, m))
 elif opcion == 'm':
     # Introducir mapa manualmente
-    A = np.zeros((n, m), dtype=int)
-    print(f"Introduce los valores del mapa {n}x{m} (valores 1-4):")
-    print("Para cada fila, introduce los números encadenados sin espacios (ej: 1234 para una fila de 4 columnas)")
+    A = np.empty((n, m), dtype=str)
+    print(f"Introduce los valores del mapa {n}x{m} (valores b, c, p, s):")
+    print("Para cada fila, introduce las letras encadenadas sin espacios (ej: bcps para una fila de 4 columnas)")
     for i in range(n):
         while True:
             try:
                 fila_str = input(f"Fila {i}: ")
                 # Verificar que la longitud coincida
                 if len(fila_str) != m:
-                    print(f"Error: debes introducir exactamente {m} números")
+                    print(f"Error: debes introducir exactamente {m} letras")
                     continue
-                # Verificar que todos sean números del 1 al 4
-                if not all(c in '1234' for c in fila_str):
-                    print("Error: solo se aceptan números del 1 al 4")
+                # Verificar que todos sean letras válidas
+                if not all(c in 'bcps' for c in fila_str):
+                    print("Error: solo se aceptan letras b, c, p, s")
                     continue
-                # Convertir a números y asignar a la fila
-                for j, valor_str in enumerate(fila_str):
-                    A[i, j] = int(valor_str)
+                # Asignar a la fila
+                for j, letra in enumerate(fila_str):
+                    A[i, j] = letra
                 break
             except ValueError:
-                print("Error: introduce solo números encadenados")
+                print("Error: introduce solo letras encadenadas")
 else:
     print("Error: opción no válida")
     exit()
@@ -49,31 +49,41 @@ if not (0 <= x < n and 0 <= y < m):
     print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
     exit()
 
-#1 significa que hay fuego i 0 significa que no.
-F_0 = np.zeros((n, m), dtype=int)
-F_0[x, y] = 1
+# 'f' significa que hay fuego, letra del terreno significa que no hay fuego, 'q' que ya está quemado.
+F_0 = A.copy()
+F_0[x, y] = 'f'
 
 # Matriz de probabilidades de propagación del fuego
-# probabilidades[terreno_origen][terreno_destino] = probabilidad
-probabilidades = {
-    1: {1: 0.8, 2: 0.7, 3: 0.5, 4: 0.0},  # de bosque
-    2: {2: 0.5, 3: 0.4, 4: 0.0},          # de cultivo
-    3: {3: 0.2, 4: 0.0},                  # de población
-    4: {4: 0.0}                           # de zona segura
+suelos_info = {
+    'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray', 'prob_quemado': 0.1},
+    'b': {'id': 1, 'label': 'Bosque', 'color': 'forestgreen', 'prob_quemado': 0.8},
+    'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold', 'prob_quemado': 0.5},
+    's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue', 'prob_quemado': 0.0},
+    'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black', 'prob_quemado': 0.0},
+    'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red', 'prob_quemado': 1.0}
 }
+
+# Probabilidades de propagación del fuego entre terrenos
+probabilidades = {
+    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
+    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
+    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
+    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0}
+}
+
 
 def calcular_F_1(A, F_0):
     """
     Calcula F_1 basado en F_0 y las probabilidades de propagación del fuego.
     
     Parámetros:
-    A: matriz del mapa (valores 1-4 indicando tipo de terreno)
-    F_0: matriz del estado inicial del fuego (1=fuego, 0=sin fuego)
+    A: matriz del mapa (letras b, c, p, s indicando tipo de terreno)
+    F_0: matriz del estado inicial del fuego (letras del terreno, 'f'=fuego, 'q'=quemado)
     
     Retorna:
     F_1: matriz del estado del fuego después de 1 paso temporal
     """
-    F_1 = F_0.copy().astype(float)
+    F_1 = F_0.copy()
     rows, cols = A.shape
     
     # Direcciones adyacentes (arriba, abajo, izquierda, derecha)
@@ -82,7 +92,7 @@ def calcular_F_1(A, F_0):
     # Para cada celda con fuego en F_0
     for i in range(rows):
         for j in range(cols):
-            if F_0[i, j] == 1:  # Si hay fuego en esta celda
+            if F_0[i, j] == 'f':  # Si hay fuego en esta celda
                 terreno_origen = A[i, j]
                 
                 # Propagar a las celdas adyacentes
@@ -93,29 +103,38 @@ def calcular_F_1(A, F_0):
                     if 0 <= ni < rows and 0 <= nj < cols:
                         terreno_destino = A[ni, nj]
                         
+                        # Comprovar si la celda destino ya está quemada o con fuego
+                        if F_0[ni, nj] == 'q' or F_1[ni, nj] == 'f':
+                            continue
+                        
                         # Obtener la probabilidad de propagación
-                        if terreno_origen in probabilidades:
-                            prob = probabilidades[terreno_origen].get(terreno_destino, 0.0)
-                        else:
-                            prob = 0.0
+                        prob = probabilidades[terreno_origen].get(terreno_destino, 0.0)
                         
                         # Aplicar la probabilidad (usando probabilidad)
                         if np.random.random() < prob:
-                            F_1[ni, nj] = 1
+                            F_1[ni, nj] = 'f'
     
-    return F_1.astype(int)
+    for i in range(rows):
+        for j in range(cols):
+            if F_0[i, j] == 'f': # Si había fuego en esta celda, ahora se quema
+                F_1[i, j] = 'q'
+    
+    return F_1
 
-# Pedir al usuario el número de pasos
-n = int(input("¿Cuántos pasos temporal quieres simular? "))
-
-# Calcular F_n iterando n veces
+# Calcular F_n hasta que no haya más fuego activo (solo letras del terreno y 'q')
 F_actual = F_0.copy()
-for paso in range(n):
+F_list = [F_0.copy()]
+while np.any(F_actual == 'f'):
     F_actual = calcular_F_1(A, F_actual)
+    F_list.append(F_actual.copy())
 
-print("Mapa (A):")
-print(A)
-print("\nEstado inicial del fuego (F_0):")
-print(F_0)
-print(f"\nEstado del fuego después de {n} pasos (F_{n}):")
-print(F_actual)
+# Guardar las matrices en un archivo .txt
+with open('matrices.txt', 'w') as f:
+    f.write(str(A))
+    f.write("\n")
+    
+    for idx, F in enumerate(F_list):
+        f.write(str(F))
+        f.write("\n")
+
+print("Las matrices se han guardado en 'matrices.txt'")
