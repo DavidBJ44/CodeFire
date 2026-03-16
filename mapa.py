@@ -74,8 +74,7 @@ def generar_video_incendio(archivo_txt, nombre_salida):
 
 
     ani = FuncAnimation(fig, update, frames=len(matrices_numericas), interval=1000, blit=False)
-    plt.tight_layout()
-
+    plt.subplots_adjust(top=0.88, right=0.8)
     # 4. Guardar directamente como MP4 , libreria ffmpeg
     print(f"Generando video MP4: {nombre_salida}...")
     writer = FFMpegWriter(fps=1)
