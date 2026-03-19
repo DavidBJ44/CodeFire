@@ -2,7 +2,7 @@ import numpy as np
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
-def calcular_F_1(testm_temp):
+def calcular_F_1(testm_temp,salida):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
@@ -14,6 +14,7 @@ def calcular_F_1(testm_temp):
     """
     testm_temp = np.array(testm_temp)
     n, m = testm_temp.shape
+
     probabilidades = {
     'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
     'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
@@ -96,7 +97,7 @@ def calcular_F_1(testm_temp):
         F_list.append(F_actual.copy())
     
     # Guardar las matrices en un archivo .txt
-    with open('test10.txt', 'w') as f:
+    with open(salida, 'w') as f:
         f.write(str(testm_temp))
         f.write("\n\n")
         
@@ -104,7 +105,5 @@ def calcular_F_1(testm_temp):
             f.write(str(F))
             f.write("\n\n")
     
-    print("Las matrices se han guardado en 'test10.txt'")
-     
 
 
