@@ -14,11 +14,12 @@ def generar_video_incendio(archivo_txt, nombre_salida):
     # 1. Configuración de tipos de suelo
     suelos_info = {
         'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray'},
-        'b': {'id': 1, 'label': 'Bosque', 'color': 'forestgreen'},
+        'b': {'id': 1, 'label': 'Bosque', 'color': "#0d3604"},
         'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold'},
         's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue'},
         'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black'},
-        'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'}
+        'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'},
+        't': {'id': 6, 'label': 'Pradera', 'color': "#5ca44c"}
     }
 
     # 2. Leer archivo
@@ -36,7 +37,7 @@ def generar_video_incendio(archivo_txt, nombre_salida):
         filas_texto = bloque.strip().split('\n')
         matriz_paso = []
         for fila in filas_texto:
-            caracteres = re.findall(r'[pbcsvqf]', fila)
+            caracteres = re.findall(r'[pbcsvqfx]', fila)
             if caracteres:
                 fila_num = [suelos_info[c]['id'] for c in caracteres]
                 matriz_paso.append(fila_num)
