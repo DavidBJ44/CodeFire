@@ -1,4 +1,6 @@
 import numpy as np
+# Añade esto al principio del archivo, después de los imports
+np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
 def calcular_F_1(A_original):
     """
