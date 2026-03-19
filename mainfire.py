@@ -14,19 +14,22 @@ matriz_guardada = None
 
 suelos_info = {
     'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray'},
-    'b': {'id': 1, 'label': 'Bosque', 'color': 'forestgreen',},
+    'b': {'id': 1, 'label': 'Bosque', 'color': "#0d3604"},
     'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold'},
     's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue'},
     'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black'},
-    'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'}
+    'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'},
+    't': {'id': 6, 'label': 'Pradera', 'color': "#5ca44c"}
 }
 
 # Probabilidades de propagación del fuego entre terrenos
 probabilidades = {
-    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0}
+     'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    't': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3}
+
 }
 def leerm(nombre_archivo):
     global matriz_guardada

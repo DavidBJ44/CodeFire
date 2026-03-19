@@ -2,23 +2,24 @@ import numpy as np
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
-def calcular_F_1(A_original):
+def calcular_F_1(testm_temp):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
     Parámetros:
-    A_original: matriz del mapa inicial (letras b, c, p, s indicando tipo de terreno)
+    testm_temp: matriz del mapa inicial (letras b, c, p, s, t indicando tipo de terreno)
     
     Retorna:
     F_list: lista de matrices del estado del fuego en cada paso temporal
     """
-    A_original = np.array(A_original)
-    n, m = A_original.shape
+    testm_temp = np.array(testm_temp)
+    n, m = testm_temp.shape
     probabilidades = {
-    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0},
-    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0}
+    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+    't': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3}
 }
     # Pedir coordenadas del fuego inicial
     x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
@@ -28,8 +29,17 @@ def calcular_F_1(A_original):
     if not (0 <= x < n and 0 <= y < m):
         print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
         exit()
-    
-    A = A_original.copy()  # A es el mapa de terrenos
+
+    # Pedir vector de viento (componentes x,y) después de elegir la ubicación inicial del fuego
+    wx = float(input("Introduce componente x del viento (derecha +, izquierda -): "))
+    wy = float(input("Introduce componente y del viento (abajo +, arriba -): "))
+    wind_mag = np.hypot(wx, wy) # Calcula el módulo del viento (.hypot calcula la hipotenusa)
+    if wind_mag > 0:
+        wind_dir = (wx / wind_mag, wy / wind_mag)
+    else:
+        wind_dir = (0.0, 0.0)
+
+    A = testm_temp.copy()  # A es el mapa de terrenos
     F = A.copy()  # F es el estado del fuego
     F[x, y] = 'f'
     
@@ -63,7 +73,16 @@ def calcular_F_1(A_original):
                             
                             # Obtener la probabilidad de propagación
                             prob = probabilidades[terreno_origen].get(terreno_destino, 0.0)
-                            
+
+                            # Ajustar la probabilidad según el viento: aumenta en la dirección del viento,
+                            # disminuye en dirección contraria.
+                            dir_mag = np.hypot(di, dj)
+                            if dir_mag > 0 and wind_mag > 0:
+                                dir_vec = (di / dir_mag, dj / dir_mag)
+                                alineacion = wind_dir[0] * dir_vec[0] + wind_dir[1] * dir_vec[1]
+                                factor_viento = 1 + 0.5 * alineacion * min(1, wind_mag)
+                                prob = np.clip(prob * factor_viento, 0.0, 1.0)
+
                             # Aplicar la probabilidad (usando probabilidad)
                             if np.random.random() < prob:
                                 F_1[ni, nj] = 'f'
@@ -78,7 +97,7 @@ def calcular_F_1(A_original):
     
     # Guardar las matrices en un archivo .txt
     with open('test10.txt', 'w') as f:
-        f.write(str(A_original))
+        f.write(str(testm_temp))
         f.write("\n\n")
         
         for idx, F in enumerate(F_list):
