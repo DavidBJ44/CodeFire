@@ -2,26 +2,25 @@ import numpy as np
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
-def calcular_F_1(testm_temp,salida):
+def calcular_F_1(A_original, nombre_archivo_salida):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
     Parámetros:
-    testm_temp: matriz del mapa inicial (letras b, c, p, s, t indicando tipo de terreno)
+    A_original: matriz del mapa inicial (letras b, c, p, s indicando tipo de terreno)
     
     Retorna:
     F_list: lista de matrices del estado del fuego en cada paso temporal
     """
-    testm_temp = np.array(testm_temp)
-    n, m = testm_temp.shape
-
+    A_original = np.array(A_original)
+    n, m = A_original.shape
     probabilidades = {
-    'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    't': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3}
-}
+        'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+        'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+        'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+        's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
+        't': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3}
+    }
     # Pedir coordenadas del fuego inicial
     x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
     y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
@@ -31,16 +30,17 @@ def calcular_F_1(testm_temp,salida):
         print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
         exit()
 
-    # Pedir vector de viento (componentes x,y) después de elegir la ubicación inicial del fuego
-    wx = float(input("Introduce componente x del viento (derecha +, izquierda -): "))
-    wy = float(input("Introduce componente y del viento (abajo +, arriba -): "))
-    wind_mag = np.hypot(wx, wy) # Calcula el módulo del viento (.hypot calcula la hipotenusa)
+    # --- Pedir vector de viento ---
+    wx = float(input("Viento X (Derecha +1 / Izquierda -1): "))
+    wy = float(input("Viento Y (Abajo +1 / Arriba -1): "))
+    wind_mag = np.hypot(wx, wy)
     if wind_mag > 0:
+        # Normalizamos el vector para que solo indique dirección
         wind_dir = (wx / wind_mag, wy / wind_mag)
     else:
         wind_dir = (0.0, 0.0)
-
-    A = testm_temp.copy()  # A es el mapa de terrenos
+    
+    A = A_original.copy()  # A es el mapa de terrenos
     F = A.copy()  # F es el estado del fuego
     F[x, y] = 'f'
     
@@ -74,17 +74,28 @@ def calcular_F_1(testm_temp,salida):
                             
                             # Obtener la probabilidad de propagación
                             prob = probabilidades[terreno_origen].get(terreno_destino, 0.0)
+                            
+                            if 0 <= ni < rows and 0 <= nj < cols:
+                                terreno_destino = A[ni, nj]
+                                
+                                if F_actual[ni, nj] == 'q' or F_1[ni, nj] == 'f':
+                                    continue
+                                
+                                # 1. Obtener probabilidad base
+                                prob = probabilidades[terreno_origen].get(terreno_destino, 0.0)
+                                
+                                # --- NUEVO: Ajustar por viento ---
+                                if wind_mag > 0:
+                                    dir_mag = np.hypot(di, dj) # Longitud del salto (1 o 1.41)
+                                    # Producto escalar: (VientoX * SaltoX) + (VientoY * SaltoY)
+                                    # Importante: dj es X (columnas), di es Y (filas)
+                                    alineacion = (wind_dir[0] * (dj/dir_mag)) + (wind_dir[1] * (di/dir_mag))
+                                    
+                                    # Aplicamos el factor (puedes multiplicar wind_mag por 1.5 si quieres más efecto)
+                                    factor_viento = 1 + (alineacion * wind_mag)
+                                    prob = np.clip(prob * factor_viento, 0.0, 1.0)
 
-                            # Ajustar la probabilidad según el viento: aumenta en la dirección del viento,
-                            # disminuye en dirección contraria.
-                            dir_mag = np.hypot(di, dj)
-                            if dir_mag > 0 and wind_mag > 0:
-                                dir_vec = (di / dir_mag, dj / dir_mag)
-                                alineacion = wind_dir[0] * dir_vec[0] + wind_dir[1] * dir_vec[1]
-                                factor_viento = 1 + 0.5 * alineacion * min(1, wind_mag)
-                                prob = np.clip(prob * factor_viento, 0.0, 1.0)
-
-                            # Aplicar la probabilidad (usando probabilidad)
+                                    
                             if np.random.random() < prob:
                                 F_1[ni, nj] = 'f'
         
@@ -97,13 +108,22 @@ def calcular_F_1(testm_temp,salida):
         F_list.append(F_actual.copy())
     
     # Guardar las matrices en un archivo .txt
-    with open(salida, 'w') as f:
-        f.write(str(testm_temp))
+    with open(nombre_archivo_salida, 'w') as f:
+        f.write(str(A_original))
         f.write("\n\n")
         
         for idx, F in enumerate(F_list):
             f.write(str(F))
             f.write("\n\n")
     
+    with open(nombre_archivo_salida, 'w') as f:
+        f.write(str(A_original))
+        f.write("\n\n")
+        
+        for idx, F in enumerate(F_list):
+            f.write(str(F))
+            f.write("\n\n")
+    
+    print(f"Las matrices se han guardado en '{nombre_archivo_salida}'")
 
 

@@ -87,6 +87,6 @@ def leerm(nombre_archivo):
     except Exception as e:
         print(f"Error al leer la matriz: {e}")
 
-leerm("testprados.txt")
-calcular_F_1 (matriz_guardada, "testpraados_completos.txt")
-generar_video_incendio("testpraados_completos.txt", "videoparados")
+leerm("testp&v.txt")
+calcular_F_1 (matriz_guardada, "testp&v2.txt")
+generar_video_incendio("testp&v2.txt", "videop&v")

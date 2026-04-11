@@ -1,0 +1,13 @@
+# Ignorar el entorno virtual (esto es lo más importante)
+venv/
+env/
+
+# Ignorar archivos temporales de Python
+__pycache__/
+*.pyc
+
+# Ignorar carpetas de configuración de VS Code
+.vscode/
+#docs de prubas
+test*
+video*

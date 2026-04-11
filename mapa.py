@@ -37,7 +37,7 @@ def generar_video_incendio(archivo_txt, nombre_salida):
         filas_texto = bloque.strip().split('\n')
         matriz_paso = []
         for fila in filas_texto:
-            caracteres = re.findall(r'[pbcsvqfx]', fila)
+            caracteres = re.findall(r'[pbcsvqft]', fila)
             if caracteres:
                 fila_num = [suelos_info[c]['id'] for c in caracteres]
                 matriz_paso.append(fila_num)
@@ -58,7 +58,7 @@ def generar_video_incendio(archivo_txt, nombre_salida):
     fig, ax = plt.subplots(figsize=(10, 7))
     
     # Crear la imagen inicial
-    im = ax.imshow(matrices_numericas[0], cmap=cmap_personalizado, vmin=0, vmax=5)
+    im = ax.imshow(matrices_numericas[0], cmap=cmap_personalizado, vmin=0, vmax=6)
     ax.grid(which='major', axis='both', linestyle='-', color='white', linewidth=1)
     ax.set_xticks(np.arange(-.5, columnas, 1))
     ax.set_yticks(np.arange(-.5, filas, 1))
@@ -81,4 +81,4 @@ def generar_video_incendio(archivo_txt, nombre_salida):
     writer = FFMpegWriter(fps=1)
     ani.save(nombre_salida, writer=writer)
     print("¡Proceso finalizado con éxito!")
-generar_video_incendio("test2.txt", "videotest2")
+#generar_video_incendio("test2.txt", "videotest2")
