@@ -6,7 +6,7 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 import re
 import os
 
-def generar_video_incendio(archivo_txt, nombre_salida):
+def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     # Asegurarnos de que el nombre tenga una extensión válida
     if not nombre_salida.endswith(('.mp4')):
         nombre_salida += ".mp4"
@@ -67,7 +67,18 @@ def generar_video_incendio(archivo_txt, nombre_salida):
     
     parches = [mpatches.Patch(color=info['color'], label=info['label']) for info in suelos_info.values()]
     ax.legend(handles=parches, bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    if wx != 0 or wy != 0:
+        # Dibujamos la flecha en la esquina inferior izquierda (coordenadas relativas al eje 0,0 a 1,1)
+        # La flecha apunta en la dirección del viento (wx, wy)
+        ax.annotate('', xy=(0.1, 0.1), xycoords='axes fraction',
+                    xytext=(0.1 - wx*0.05, 0.1 - wy*0.05), textcoords='axes fraction',
+                    arrowprops=dict(facecolor='white', edgecolor='white', headwidth=10, width=3),
+                    label='Dirección Viento')
+        # Añadimos una etiqueta de texto pequeña
+        ax.text(0.05, 0.02, 'Viento', transform=ax.transAxes, color='white', fontsize=10, fontweight='bold')
 
+        
     def update(frame):
         ax.set_title(f"Simulación de Propagación de Fuego - Paso {frame}", fontsize=16)
         im.set_array(matrices_numericas[frame])
