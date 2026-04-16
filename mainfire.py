@@ -32,8 +32,8 @@ probabilidades = {
 
 }
 # --- Pedir vector de viento ---
-wx = float(input("Viento X (Derecha +1 / Izquierda -1): "))
-wy = float(input("Viento Y (Abajo +1 / Arriba -1): "))
+wx = float(input("Viento X (Izquierda -1 / Derecha +1): "))
+wy = float(input("Viento Y (Abajo -1 / Arriba +1): "))
 
 def leerm(nombre_archivo):
     global matriz_guardada

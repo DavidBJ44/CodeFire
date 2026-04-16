@@ -87,7 +87,7 @@ def calcular_F_1(A_original, nombre_archivo_salida, wx, wy):
                                     dir_mag = np.hypot(di, dj) # Longitud del salto (1 o 1.41)
                                     # Producto escalar: (VientoX * SaltoX) + (VientoY * SaltoY)
                                     # Importante: dj es X (columnas), di es Y (filas)
-                                    alineacion = (wind_dir[0] * (dj/dir_mag)) + (wind_dir[1] * (di/dir_mag))
+                                    alineacion = (wind_dir[0] * (dj/dir_mag)) + (wind_dir[1] * (-di/dir_mag))
                                     
                                     # Aplicamos el factor (puedes multiplicar wind_mag por 1.5 si quieres más efecto)
                                     factor_viento = 1 + (alineacion * wind_mag)
