@@ -31,6 +31,10 @@ probabilidades = {
     't': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3}
 
 }
+# --- Pedir vector de viento ---
+wx = float(input("Viento X (Derecha +1 / Izquierda -1): "))
+wy = float(input("Viento Y (Abajo +1 / Arriba -1): "))
+
 def leerm(nombre_archivo):
     global matriz_guardada
     
@@ -88,5 +92,5 @@ def leerm(nombre_archivo):
         print(f"Error al leer la matriz: {e}")
 
 leerm("testp&v.txt")
-calcular_F_1 (matriz_guardada, "testp&v2.txt")
-generar_video_incendio("testp&v2.txt", "videop&v")
+calcular_F_1 (matriz_guardada, "testp&v2.txt", wx,wy)
+generar_video_incendio("testp&v2.txt", "videop&v",wx,wy)

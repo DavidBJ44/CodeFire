@@ -2,7 +2,7 @@ import numpy as np
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
-def calcular_F_1(A_original, nombre_archivo_salida):
+def calcular_F_1(A_original, nombre_archivo_salida, wx, wy):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
@@ -30,9 +30,7 @@ def calcular_F_1(A_original, nombre_archivo_salida):
         print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
         exit()
 
-    # --- Pedir vector de viento ---
-    wx = float(input("Viento X (Derecha +1 / Izquierda -1): "))
-    wy = float(input("Viento Y (Abajo +1 / Arriba -1): "))
+
     wind_mag = np.hypot(wx, wy)
     if wind_mag > 0:
         # Normalizamos el vector para que solo indique dirección
