@@ -38,10 +38,9 @@ def avance_fuego(A_resistencias, A_potencial, nombre_archivo_salida, A_altitud, 
     distancias = [cell_size, cell_size, cell_size, cell_size, cell_size * np.sqrt(2), cell_size * np.sqrt(2), cell_size * np.sqrt(2), cell_size * np.sqrt(2)]
     
     
-    if x is None or y is None:
-         # Pedir coordenadas del fuego inicial
-        x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
-        y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
+    
+    x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
+    y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
     
     # Validar que las coordenadas están dentro del rango
     if not (0 <= x < n and 0 <= y < m):
