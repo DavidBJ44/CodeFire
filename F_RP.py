@@ -40,17 +40,12 @@ def generar_diccionario_fuego(ffmc, bui, t_ambiente):
         # Fórmula: (Suma de cargas) * (1 - e^(-K * BUI))
         carga_total = w1h + w10h + w100h
         # math.exp(x) es e^x
-        potencial_quemado = carga_total * (1 - math.exp(-k * bui))
+        p_q = carga_total * (1 - math.exp(-k * bui))
 
         # --- 3. GUARDAR RESULTADOS ---
         tipos_combustible[clave] = {
-            'carga_1h': w1h,
-            'M': m,
-            'carga_10h': w10h,
-            'carga_100h': w100h,
-            'K': k,
-            'e_act': round(e_act, 2),
-            'p_q': round(potencial_quemado, 4)
+            'e_act': e_act,
+            'p_q': p_q
         }
 
     return tipos_combustible
