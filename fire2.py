@@ -2,7 +2,7 @@ import numpy as np
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
-def avance_fuego(A_resistencias, A_potencial, nombre_archivo_salida, A_altitud=None, x=None, y=None, A_terreno=None):
+def avance_fuego(A_resistencias, A_potencial, nombre_archivo_salida, A_altitud, A_terreno):
     """
     Calcula la lista de matrices F desde el estado inicial en A hasta que no haya más fuego activo.
     
@@ -21,29 +21,16 @@ def avance_fuego(A_resistencias, A_potencial, nombre_archivo_salida, A_altitud=N
     if A_potencial.shape != (n, m):
         raise ValueError("Las matrices de resistencias y potencial deben tener la misma forma")
     
-    if A_altitud is not None:
-        A_altitud = np.array(A_altitud, dtype=float)
-        if A_altitud.shape != (n, m):
-            raise ValueError("La matriz de altitud debe tener la misma forma que las otras matrices")
-    else:
-        A_altitud = np.zeros((n, m), dtype=float)  # Plano si no se proporciona
     
-    if A_terreno is not None:
-        A_terreno = np.array(A_terreno, dtype=str)
-        if A_terreno.shape != (n, m):
-            raise ValueError("La matriz de terreno debe tener la misma forma que las otras matrices")
-    else:
-        # Pedir input para la matriz de terreno
-        print("Introduce la matriz de tipos de terreno (b, c, p) fila por fila:")
-        A_terreno = []
-        for i in range(n):
-            fila = input(f"Fila {i}: ").strip().split()
-            if len(fila) != m:
-                raise ValueError(f"La fila {i} debe tener {m} elementos")
-            A_terreno.append(fila)
-        A_terreno = np.array(A_terreno, dtype=str)
+    A_altitud = np.array(A_altitud, dtype=float)
+    if A_altitud.shape != (n, m):
+        raise ValueError("La matriz de altitud debe tener la misma forma que las otras matrices")
     
-    # Tamaño de cada celda en metros (10m x 10m)
+    
+    A_terreno = np.array(A_terreno, dtype=str)
+    if A_terreno.shape != (n, m):
+        raise ValueError("La matriz de terreno debe tener la misma forma que las otras matrices")
+    
     cell_size = 10.0
     
     # Direcciones y sus distancias (para diagonales usamos la hipotenusa)
