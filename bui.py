@@ -4,22 +4,40 @@ import pandas as pd
 
 def calcular_bui(matriz):
     # Assume matriz is a 30x4 NumPy array: rows = days (0-29), columns = [temp (°C), rh (%), rain (mm)]
-    if matriz.shape != (30, 3):
+    if matriz.shape != (30, 4):
         raise ValueError("La matriz de BUI debe tener 30 filas y 3 columnas.")
     
-    dmc = 0.0  # Falta definir valor inicial
-    dc = 0.0   # Falta definir valor inicial
+    primera_fila = None
+    for i in range(29,-1,-1):
+        if matriz[i, 3] > 1.5:
+            primera_fila = i
+            break
     
-    for dia in range(0, 29):  # Loop from day 1 to 29
-        T = matriz[dia, 0]  # Temperature
-        H = matriz[dia, 1]  # Relative humidity
-        R = matriz[dia, 3]  # Rainfall
-        if R > 1.5:
-            dmc = raincode_DMC(R, dmc)
-            dc = raincode_DC(R, dc)
-        dmc = table4(T,H)
-        dc = table6(T)
-        bui = table8(dmc, dc)
+    if primera_fila is None:
+        dmc = 50.0  # Valor inicial de DMC
+        dc = 350.0  # Valor inicial de DC
+        for dia in range(0, 29):  # Loop from day 1 to 29
+            T = matriz[dia, 0]  # Temperature
+            H = matriz[dia, 1]  # Relative humidity
+            R = matriz[dia, 3]  # Rainfall
+            if R > 1.5:
+                dmc = raincode_DMC(R, dmc)
+                dc = raincode_DC(R, dc)
+            dmc = table4(T,H)
+            dc = table6(T)
+            bui = table8(dmc, dc)
+    
+    else:
+        for dia in range(i, 29):
+            T = matriz[dia, 0]  # Temperature
+            H = matriz[dia, 1]  # Relative humidity
+            R = matriz[dia, 3]  # Rainfall
+            if R > 1.5:
+                dmc = raincode_DMC(R, dmc)
+                dc = raincode_DC(R, dc)
+            dmc = table4(T,H)
+            dc = table6(T)
+            bui = table8(dmc, dc) 
     return bui
 
 
