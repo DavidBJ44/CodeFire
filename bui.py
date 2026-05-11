@@ -3,41 +3,42 @@ import numpy as np
 import pandas as pd
 
 def calcular_bui(matriz):
-    # Assume matriz is a 30x4 NumPy array: rows = days (0-29), columns = [temp (°C), rh (%), rain (mm)]
-    if matriz.shape != (30, 4):
-        raise ValueError("La matriz de BUI debe tener 30 filas y 3 columnas.")
+    # Assume matriz is a 31x3 NumPy array: rows = days (0-30), columns = [temp (°C), rh (%), rain (mm)]
+    if matriz.shape != (31, 3):
+        raise ValueError("La matriz de BUI debe tener 31 filas y 3 columnas.")
     
-    primera_fila = None
-    for i in range(29,-1,-1):
-        if matriz[i, 3] > 1.5:
-            primera_fila = i
-            break
-    
+    primera_fila = next((i for i in range(31) if matriz[i, 2] > 1.5), None)
+   
+    dmc = 50.0  # Valor inicial de DMC
+    dc = 350.0  # Valor inicial de DC
+
     if primera_fila is None:
-        dmc = 50.0  # Valor inicial de DMC
-        dc = 350.0  # Valor inicial de DC
-        for dia in range(0, 29):  # Loop from day 1 to 29
+        for dia in range(31):  # Loop from day 1 to 31
             T = matriz[dia, 0]  # Temperature
             H = matriz[dia, 1]  # Relative humidity
-            R = matriz[dia, 3]  # Rainfall
+            R = matriz[dia, 2]  # Rainfall
             if R > 1.5:
                 dmc = raincode_DMC(R, dmc)
                 dc = raincode_DC(R, dc)
-            dmc = table4(T,H)
-            dc = table6(T)
+            else:
+                dmc += table4(T, H)
+                dc += table6(T)
             bui = table8(dmc, dc)
+            print(f"Day {dia+1}: BUI = {bui:.2f}  DMC = {dmc:.2f}  DC = {dc:.2f}")
     
     else:
-        for dia in range(i, 29):
+        for dia in range(primera_fila, 31):
             T = matriz[dia, 0]  # Temperature
             H = matriz[dia, 1]  # Relative humidity
-            R = matriz[dia, 3]  # Rainfall
+            R = matriz[dia, 2]  # Rainfall
             if R > 1.5:
                 dmc = raincode_DMC(R, dmc)
                 dc = raincode_DC(R, dc)
-            dmc = table4(T,H)
-            dc = table6(T)
-            bui = table8(dmc, dc) 
+            else:
+                dmc += table4(T, H)
+                dc += table6(T)
+            bui = table8(dmc, dc)
+            print(f"Day {dia+1}: BUI = {bui:.2f}  DMC = {dmc:.2f}  DC = {dc:.2f}")
     return bui
 
 
@@ -89,12 +90,14 @@ def table4(temperatura, humedad):
 
     temps = np.sort(table[temp_col].unique())
     idx_temp = np.searchsorted(temps, temperatura, side='right') - 1
-    temp_key = temps[max(0, idx_temp)]
+    idx_temp = max(0, idx_temp)
+    temp_key = temps[idx_temp]
 
     subset = table[table[temp_col] == temp_key]
     rhs = np.sort(subset[rh_col].unique())
     idx_rh = np.searchsorted(rhs, humedad, side='right') - 1
-    rh_key = rhs[max(0, idx_rh)]
+    idx_rh = max(0, idx_rh)
+    rh_key = rhs[idx_rh]
 
     return subset[subset[rh_col] == rh_key].iloc[0][value_col]
 
@@ -140,3 +143,4 @@ def table8(dmc, dc):
     idx_dc = max(0, idx_dc)
     
     return table.iloc[idx_dmc, idx_dc]
+
