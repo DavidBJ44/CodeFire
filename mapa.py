@@ -39,7 +39,7 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
         '146': {'id': 18, 'label': 'SH6', 'color': '#4CAF50'},
         '147': {'id': 19, 'label': 'SH7', 'color': '#43A047'},
         '148': {'id': 20, 'label': 'SH8', 'color': '#388E3C'},
-        '149': {'id': 21, 'label': 'SH9', 'color': '#1B5E20'},
+        '149': {'id': 21, 'label': 'SH9', 'color': "#E6E6E6"},
     # MODELOS BOSQUE: MADERA-SOTOBOSQUE (TU) - Verdes Oscuros / Oliva
         '161': {'id': 22, 'label': 'TU1', 'color': '#556B2F'},
         '162': {'id': 23, 'label': 'TU2', 'color': '#4B5320'},
@@ -67,9 +67,9 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     # MODELOS NO COMBUSTIBLES (NB - Non-Burnable)
         '91': {'id': 43, 'label': 'NB1', 'color': '#424242'}, # Urbano/Infraestructuras (Asfalto, edificios)
         '92': {'id': 44, 'label': 'NB2', 'color': '#E0E0E0'}, # Suelo desnudo (Roca, arena, canteras)
-        '93': {'id': 45, 'label': 'NB3', 'color': '#BBDEFB'}, # Agua (Ríos, lagos, canales, mar)
-        '94': {'id': 46, 'label': 'NB4', 'color': '#B3E5FC'}, # Zonas húmedas (Tierras bajas inundadas, humedales)
-        '95': {'id': 47, 'label': 'NB5', 'color': '#01579B'}, # Agua profunda / Masas de agua permanentes
+        '93': {'id': 45, 'label': 'NB3', 'color': '#3030AC'}, # Agua (Ríos, lagos, canales, mar)
+        '94': {'id': 46, 'label': 'NB4', 'color': '#3030AC'}, # Zonas húmedas (Tierras bajas inundadas, humedales)
+        '95': {'id': 47, 'label': 'NB5', 'color': '#3030AC'}, # Agua profunda / Masas de agua permanentes
         '96': {'id': 48, 'label': 'NB6', 'color': '#FFFFFF'}, # Nieve / Hielo (Cumbres nevadas o glaciares)
         '97': {'id': 49, 'label': 'NB7', 'color': '#BDBDBD'}, # Otros (Uso genérico para huecos sin datos)
         '98': {'id': 50, 'label': 'Quemado (NB8)', 'color': '#212121'}, # Terreno quemado recientemente (sin vegetación)
@@ -178,6 +178,5 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     writer = FFMpegWriter(fps=1)
     ani.save(nombre_salida, writer=writer)
     print("¡Proceso finalizado con éxito!")
-#generar_video_incendio("test2.txt", "videotest2")
-
-generar_video_incendio('mat_text.txt','mat_text_out',1,1)
+#ejemplo uso 
+generar_video_incendio('evolucion_fuego.txt','mat_text_out',1,1)

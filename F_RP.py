@@ -1,5 +1,13 @@
 import math
 import json
+import bui
+import ffmc
+
+"""
+-generar diccinario fuego:Coge los datos iniciales y con cada tipo de suelo se crea un nuevo diccionario con la e_a y p_q asociada a cada tipo de suelo. 
+-gen e p m: Con ese diccionario se crea una un doc con la matriz de suelo, la matriz de altitudes, la matriz de e_a y la p_q
+!!!! falta meter la funcion bui i ffmc para q funcione auromatico
+"""
 
 def generar_diccionario_fuego(ffmc, bui, t_ambiente):
     # --- CONSTANTES FÍSICAS ---
@@ -15,7 +23,7 @@ def generar_diccionario_fuego(ffmc, bui, t_ambiente):
     # Los valores de carga están en kg/m2
     # K es una constante de transmisividad/quemado (ejemplo: entre 0.01 y 0.05)
     tabla_base = {
-    '0': [0.00, 0.00, 0.00, 0.00], #terreno urbano 
+    '0':  [0.00, 0.00, 0.00, 0.00], #terreno urbano 
     '91': [0.0, 0.0, 0.0, 0.04], # Urbano
     '92': [0.0, 0.0, 0.0, 0.04], # Roca
     '93': [0.0, 0.0, 0.0, 0.04], # Agua
@@ -93,19 +101,16 @@ def generar_diccionario_fuego(ffmc, bui, t_ambiente):
         term_agua = m * (CP_AGUA * (100 - t_ambiente) + L_VAPORIZACION)
         q_ignicion = w1h * (term_madera + term_agua)
         
-        e_act = q_ignicion * (101 - ffmc)* 20 #por metres cuadrats
+        e_act = q_ignicion * (101 - ffmc)* 400 #por metres cuadrats
 
         # --- 2. CÁLCULO POTENCIAL DE QUEMADO (P_Q) ---
         # Fórmula: (Suma de cargas) * (1 - e^(-K * BUI))
         carga_total = w1h + w10h + w100h
         # math.exp(x) es e^x
-        p_q = carga_total * (1 - math.exp(-k * bui)) *18000*20
+        p_q = carga_total * (1 - math.exp(-k * bui)) *18000*400
 
         # --- 3. GUARDAR RESULTADOS ---
-        tipos_combustible[clave] = {
-            'e_act': e_act,
-            'p_q': p_q
-        }
+        tipos_combustible[clave] = [e_act,p_q]
 
     return tipos_combustible
 
@@ -118,4 +123,83 @@ m = 0.8           #humedad q suponemos constante en todo el terreno
 self_tipos_combustible = generar_diccionario_fuego(FFMC_VALOR, BUI_VALOR, TEMP_AMB)
 
 # Mostrar resultado
-print(json.dumps(self_tipos_combustible, indent=4))
+print(self_tipos_combustible)
+
+import sys
+
+def Gen_e_q_m(archivo_entrada, archivo_salida, diccionario_referencia):
+    """
+    Lee un archivo con matrices de suelo y altitud, y genera un archivo con
+    las originales más las matrices de Ea y Pq calculadas.
+    """
+    
+    try:
+        with open(archivo_entrada, 'r') as f:
+            contenido = f.read().strip().split('\n\n')
+            
+        if len(contenido) < 2:
+            print("Error: El archivo de entrada debe contener al menos dos matrices separadas por una línea en blanco.")
+            return
+
+        # --- PASO 2: Procesar la matriz de Suelos ---
+        # Convertimos el texto en una lista de listas (matriz de strings)
+        lineas_suelo = contenido[0].strip().split('\n')
+        matriz_suelos = [linea.split() for linea in lineas_suelo]
+        
+        # Guardamos la de altitudes tal cual para el output (aunque no se use)
+        matriz_altitudes_texto = contenido[1].strip()
+
+        filas = len(matriz_suelos)
+        columnas = len(matriz_suelos[0])
+
+        # Crear matrices vacías para Ea y Pq
+        matriz_ea = []
+        matriz_pq = []
+
+        # --- PASO 3: Mapeo y validación ---
+        for i in range(filas):
+            fila_ea = []
+            fila_pq = []
+            for j in range(columnas):
+                suelo_id = matriz_suelos[i][j]
+                
+                # Comprobar si el ID existe en el diccionario
+                if suelo_id in diccionario_referencia:
+                    # Suponemos formato [e_a, p_q]
+                    valores = diccionario_referencia[suelo_id]
+                    fila_ea.append(str(valores[0]))
+                    fila_pq.append(str(valores[1]))
+                else:
+                    # ERROR: Si el número no está lincado, break y aviso
+                    print(f"\nERROR CRÍTICO: El número de suelo '{suelo_id}' en la posición ({i},{j}) no está en el diccionario.")
+                    return # Detiene la ejecución de la función
+            
+            matriz_ea.append(fila_ea)
+            matriz_pq.append(fila_pq)
+
+        # --- PASO 4: Generar documento de salida ---
+        with open(archivo_salida, 'w') as f_out:
+            # 1. Matriz de Suelos Original
+            f_out.write("\n".join([" ".join(f) for f in matriz_suelos]))
+            f_out.write("\n\n")
+            
+            # 2. Matriz de Altitudes Original
+            f_out.write(matriz_altitudes_texto)
+            f_out.write("\n\n")
+            
+            # 3. Matriz de E_a
+            f_out.write("\n".join([" ".join(f) for f in matriz_ea]))
+            f_out.write("\n\n")
+            
+            # 4. Matriz de P_q
+            f_out.write("\n".join([" ".join(f) for f in matriz_pq]))
+
+        print(f"Proceso completado. Archivo '{archivo_salida}' generado con éxito.")
+
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo '{archivo_entrada}'.")
+    except Exception as e:
+        print(f"Ocurrió un error inesperado: {e}")
+
+# --- EJEMPLO DE USO ---
+Gen_e_q_m('matrices_solo.txt', 'salida.txt', self_tipos_combustible)
