@@ -86,7 +86,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
         A_terreno_list.append(A_terreno.copy())
         
         # Si no hay cambios nuevos, salir
-        if not np.any(A_terreno == '0'):
+        if not np.any(A_terreno == 'f'):
             break
     
     # --- 4. GUARDAR RESULTADOS CON FORMATO SOLICITADO ---
@@ -104,4 +104,4 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
     print(f"Simulación finalizada. Resultados en '{nombre_archivo_salida}'")
 
 # Ejemplo de llamada:
-avance_fuego('salida.txt', 'evolucion_fuego.txt')
+#avance_fuego('salida.txt', 'evolucion_fuego.txt')

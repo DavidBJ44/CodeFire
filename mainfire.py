@@ -1,40 +1,44 @@
-from mapa import generar_video_incendio
-from fire2 import calcular_F_1
-import re
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-import matplotlib.patches as mpatches
-import numpy as np
-from matplotlib.animation import FuncAnimation, FFMpegWriter
-import re
-import os
+import F_RP
+import fire2
+import mapa
 
-# Variable global para "recordar" la matriz
-matriz_guardada = None
+def main():
+    # --- CONFIGURACIÓN DE ARCHIVOS ---
+    archivo_inicial = 'test_2Matrices.txt'    # Suelo + Altitud
+    archivo_4_matrices = 'test_4Matrices.txt'        # Suelo + Altitud + Ea + Pq
+    archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
+    archivo_video = 'simulacion_incendio'     # Nombre del video final (sin .mp4)
 
-suelos_info = {
-    'p': {'id': 0, 'label': 'Poblado', 'color': 'dimgray'},
-    'b': {'id': 1, 'label': 'Bosque', 'color': "#0d3604"},
-    'c': {'id': 2, 'label': 'Cultivos', 'color': 'gold'},
-    's': {'id': 3, 'label': 'Zona Segura', 'color': 'deepskyblue'},
-    'q': {'id': 4, 'label': 'Zona Quemada', 'color': 'black'},
-    'f': {'id': 5, 'label': 'Fuego Activo', 'color': 'red'},
-    't': {'id': 6, 'label': 'Pradera', 'color': "#5ca44c"}
-}
+    # --- 1. GENERAR DICCIONARIO Y MATRICES DE ENERGÍA (F_RP) ---
+    print("=== PASO 1: Generando Diccionario de Combustibles ===")
+    # Parámetros ambientales (puedes cambiarlos aquí)
+    ffmc = 85
+    bui = 60
+    temp_amb = 35
+    m =0.8
+    
+    # Generamos el diccionario { 'ID': [ea, pq] }
+    diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc, bui, temp_amb,m)
+    
+    # Generamos el archivo que combina las 4 matrices necesarias
+    F_RP.Gen_e_q_m(archivo_inicial, archivo_4_matrices, diccionario_fuego)
 
-# Probabilidades de propagación del fuego entre terrenos
-probabilidades = {
-     'b': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    'c': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    'p': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    's': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3},
-    't': {'b': 0.8, 'c': 0.5, 'p': 0.1, 's': 0.0, 't': 0.3}
+    # --- 2. EJECUTAR SIMULACIÓN DE AVANCE (fire2) ---
+    print("\n=== PASO 2: Simulación de Avance del Fuego ===")
+    # Nota: fire2 pedirá por consola las coordenadas X e Y de inicio
+    fire2.avance_fuego(archivo_4_matrices, archivo_evolucion)
 
-}
-# --- Pedir vector de viento ---
-wx = float(input("Viento X (Izquierda -1 / Derecha +1): "))
-wy = float(input("Viento Y (Abajo -1 / Arriba +1): "))
+    # --- 3. GENERAR VIDEO DE LA SIMULACIÓN (mapa) ---
+    print("\n=== PASO 3: Generando Video ===")
+    # wx, wy son la dirección del viento para la flecha visual
+    viento_x = 1
+    viento_y = 1
+    mapa.generar_video_incendio(archivo_evolucion, archivo_video, viento_x, viento_y)
 
-leerm("testp&v.txt")
-calcular_F_1 (matriz_guardada, "testp&v2.txt", wx,wy)
-generar_video_incendio("testp&v2.txt", "videop&v",wx,wy)
+    print("\n==============================================")
+    print(f"PROCESO FINALIZADO CON ÉXITO")
+    print(f"Video disponible en: {archivo_video}.mp4")
+    print("==============================================")
+
+if __name__ == "__main__":
+    main()

@@ -179,4 +179,4 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     ani.save(nombre_salida, writer=writer)
     print("¡Proceso finalizado con éxito!")
 #ejemplo uso 
-generar_video_incendio('evolucion_fuego.txt','mat_text_out',1,1)
+#generar_video_incendio('evolucion_fuego.txt','mat_text_out',1,1)

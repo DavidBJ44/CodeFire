@@ -9,7 +9,7 @@ import ffmc
 !!!! falta meter la funcion bui i ffmc para q funcione auromatico
 """
 
-def generar_diccionario_fuego(ffmc, bui, t_ambiente):
+def generar_diccionario_fuego(ffmc, bui, t_ambiente,m):
     # --- CONSTANTES FÍSICAS ---
     CP_MADERA = 1.4#kJ/(kg·ºC)  
     CP_AGUA = 4.18 #kJ/(kg·ºC)  
@@ -114,16 +114,17 @@ def generar_diccionario_fuego(ffmc, bui, t_ambiente):
 
     return tipos_combustible
 
-# --- PARÁMETROS DE ENTRADA ---
-FFMC_VALOR = 85   # humedad de combustibles finos
-BUI_VALOR = 60    # Build Up Index (Acumulación de combustible seco)
-TEMP_AMB = 35     # Temperatura ambiente
-m = 0.8           #humedad q suponemos constante en todo el terreno
-# Generar el diccionario
-self_tipos_combustible = generar_diccionario_fuego(FFMC_VALOR, BUI_VALOR, TEMP_AMB)
-
-# Mostrar resultado
-print(self_tipos_combustible)
+##eejmplo de uso
+## --- PARÁMETROS DE ENTRADA ---
+#FFMC_VALOR = 85   # humedad de combustibles finos
+#BUI_VALOR = 60    # Build Up Index (Acumulación de combustible seco)
+#TEMP_AMB = 35     # Temperatura ambiente
+#m = 0.8           #humedad q suponemos constante en todo el terreno
+## Generar el diccionario
+#self_tipos_combustible = generar_diccionario_fuego(FFMC_VALOR, BUI_VALOR, TEMP_AMB)
+#
+## Mostrar resultado
+#print(self_tipos_combustible)
 
 import sys
 
@@ -202,4 +203,4 @@ def Gen_e_q_m(archivo_entrada, archivo_salida, diccionario_referencia):
         print(f"Ocurrió un error inesperado: {e}")
 
 # --- EJEMPLO DE USO ---
-Gen_e_q_m('matrices_solo.txt', 'salida.txt', self_tipos_combustible)
+#Gen_e_q_m('matrices_solo.txt', 'salida.txt', self_tipos_combustible)
