@@ -107,100 +107,101 @@ def generar_diccionario_fuego(ffmc, bui, t_ambiente,m):
         # Fórmula: (Suma de cargas) * (1 - e^(-K * BUI))
         carga_total = w1h + w10h + w100h
         # math.exp(x) es e^x
-        p_q = carga_total * (1 - math.exp(-k * bui)) *18000*400
-
+        factor_pq = (1 - math.exp(-k * bui)) * 18000 * 400
+        p_q1 = w1h * factor_pq
+        p_q2 = w10h * factor_pq
+        p_q3 = w100h * factor_pq
         # --- 3. GUARDAR RESULTADOS ---
-        tipos_combustible[clave] = [e_act,p_q]
+        tipos_combustible[clave] = [e_act,p_q1,p_q2,p_q3]
 
     return tipos_combustible
 
-##eejmplo de uso
-## --- PARÁMETROS DE ENTRADA ---
+#eejmplo de uso
+# --- PARÁMETROS DE ENTRADA ---
 #FFMC_VALOR = 85   # humedad de combustibles finos
 #BUI_VALOR = 60    # Build Up Index (Acumulación de combustible seco)
 #TEMP_AMB = 35     # Temperatura ambiente
 #m = 0.8           #humedad q suponemos constante en todo el terreno
 ## Generar el diccionario
-#self_tipos_combustible = generar_diccionario_fuego(FFMC_VALOR, BUI_VALOR, TEMP_AMB)
-#
+#self_tipos_combustible = generar_diccionario_fuego(FFMC_VALOR, BUI_VALOR, TEMP_AMB,m)
+
 ## Mostrar resultado
 #print(self_tipos_combustible)
 
 import sys
 
 def Gen_e_q_m(archivo_entrada, archivo_salida, diccionario_referencia):
-    """
-    Lee un archivo con matrices de suelo y altitud, y genera un archivo con
-    las originales más las matrices de Ea y Pq calculadas.
-    """
-    
     try:
         with open(archivo_entrada, 'r') as f:
             contenido = f.read().strip().split('\n\n')
             
         if len(contenido) < 2:
-            print("Error: El archivo de entrada debe contener al menos dos matrices separadas por una línea en blanco.")
+            print("Error: El archivo de entrada debe contener al menos dos matrices (suelo y altitud).")
             return
 
-        # --- PASO 2: Procesar la matriz de Suelos ---
-        # Convertimos el texto en una lista de listas (matriz de strings)
+        # Procesar matriz de suelos
         lineas_suelo = contenido[0].strip().split('\n')
         matriz_suelos = [linea.split() for linea in lineas_suelo]
         
-        # Guardamos la de altitudes tal cual para el output (aunque no se use)
+        # Guardar matriz de altitudes original
         matriz_altitudes_texto = contenido[1].strip()
 
         filas = len(matriz_suelos)
         columnas = len(matriz_suelos[0])
 
-        # Crear matrices vacías para Ea y Pq
+        # Crear listas para las nuevas matrices
         matriz_ea = []
-        matriz_pq = []
+        matriz_pq1 = []
+        matriz_pq2 = []
+        matriz_pq3 = []
+        matriz_dieces = []
 
-        # --- PASO 3: Mapeo y validación ---
+        # Mapeo de datos
         for i in range(filas):
-            fila_ea = []
-            fila_pq = []
+            fila_ea, fila_pq1, fila_pq2, fila_pq3, fila_diez = [], [], [], [], []
             for j in range(columnas):
                 suelo_id = matriz_suelos[i][j]
                 
-                # Comprobar si el ID existe en el diccionario
                 if suelo_id in diccionario_referencia:
-                    # Suponemos formato [e_a, p_q]
                     valores = diccionario_referencia[suelo_id]
+                    # Formato esperado: [e_a, pq1, pq2, pq3]
                     fila_ea.append(str(valores[0]))
-                    fila_pq.append(str(valores[1]))
+                    fila_pq1.append(str(valores[1]))
+                    fila_pq2.append(str(valores[2]))
+                    fila_pq3.append(str(valores[3]))
+                    fila_diez.append("10") # Matriz de dieces
                 else:
-                    # ERROR: Si el número no está lincado, break y aviso
-                    print(f"\nERROR CRÍTICO: El número de suelo '{suelo_id}' en la posición ({i},{j}) no está en el diccionario.")
-                    return # Detiene la ejecución de la función
+                    print(f"\nERROR: Suelo '{suelo_id}' en ({i},{j}) no está en el diccionario.")
+                    return 
             
             matriz_ea.append(fila_ea)
-            matriz_pq.append(fila_pq)
+            matriz_pq1.append(fila_pq1)
+            matriz_pq2.append(fila_pq2)
+            matriz_pq3.append(fila_pq3)
+            matriz_dieces.append(fila_diez)
 
-        # --- PASO 4: Generar documento de salida ---
+        # Escribir todas las matrices en el archivo de salida
         with open(archivo_salida, 'w') as f_out:
-            # 1. Matriz de Suelos Original
-            f_out.write("\n".join([" ".join(f) for f in matriz_suelos]))
-            f_out.write("\n\n")
-            
-            # 2. Matriz de Altitudes Original
-            f_out.write(matriz_altitudes_texto)
-            f_out.write("\n\n")
-            
-            # 3. Matriz de E_a
-            f_out.write("\n".join([" ".join(f) for f in matriz_ea]))
-            f_out.write("\n\n")
-            
-            # 4. Matriz de P_q
-            f_out.write("\n".join([" ".join(f) for f in matriz_pq]))
+            # 1. Suelos
+            f_out.write("\n".join([" ".join(f) for f in matriz_suelos]) + "\n\n")
+            # 2. Altitudes
+            f_out.write(matriz_altitudes_texto + "\n\n")
+            # 3. E_a
+            f_out.write("\n".join([" ".join(f) for f in matriz_ea]) + "\n\n")
+            # 4. P_q1
+            f_out.write("\n".join([" ".join(f) for f in matriz_pq1]) + "\n\n")
+            # 5. P_q2
+            f_out.write("\n".join([" ".join(f) for f in matriz_pq2]) + "\n\n")
+            # 6. P_q3
+            f_out.write("\n".join([" ".join(f) for f in matriz_pq3]) + "\n\n")
+            # 7. Matriz de Dieces
+            f_out.write("\n".join([" ".join(f) for f in matriz_dieces]))
 
-        print(f"Proceso completado. Archivo '{archivo_salida}' generado con éxito.")
+        print(f"Proceso completado. Archivo '{archivo_salida}' generado con 7 matrices.")
 
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo '{archivo_entrada}'.")
     except Exception as e:
-        print(f"Ocurrió un error inesperado: {e}")
+        print(f"Ocurrió un error: {e}")
 
-# --- EJEMPLO DE USO ---
-#Gen_e_q_m('matrices_solo.txt', 'salida.txt', self_tipos_combustible)
+# --- EJEMPLO DE EJECUCIÓN ---
+#dicc = generar_diccionario_fuego(85, 60, 35, 0.8)
+#Gen_e_q_m('test_2Matrices.txt', 'salida.txt', dicc)

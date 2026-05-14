@@ -8,7 +8,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
         with open(nombre_archivo_entrada, 'r') as f:
             bloques = f.read().strip().split('\n\n')
         
-        if len(bloques) < 4:
+        if len(bloques) < 7:
             print("Error: El archivo de entrada debe tener 4 matrices (Suelo, Altitud, Ea, Pq).")
             return
 
@@ -19,9 +19,13 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
         A_altitud = np.array([linea.split() for linea in bloques[1].split('\n')], dtype=float)
         # Matriz 2: Resistencias/Ea (Float)
         A_resistencias = np.array([linea.split() for linea in bloques[2].split('\n')], dtype=float)
-        # Matriz 3: Potencial/Pq (Float)
-        A_potencial = np.array([linea.split() for linea in bloques[3].split('\n')], dtype=float)
-
+        # Matriz 3-6: Potencial/Pq (Float)
+        A_pq1 = np.array([linea.split() for linea in bloques[3].split('\n')], dtype=float)
+        A_pq2 = np.array([linea.split() for linea in bloques[4].split('\n')], dtype=float)
+        A_pq3 = np.array([linea.split() for linea in bloques[5].split('\n')], dtype=float)
+        
+        # Matriz 7 de contadores (la de los dieces)
+        A_contador = np.array([linea.split() for linea in bloques[6].split('\n')], dtype=float)
     except Exception as e:
         print(f"Error al leer el archivo: {e}")
         return
@@ -111,65 +115,78 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
     
     A_terreno_list = [A_terreno.copy()]
     
-    while np.any(A_terreno == 'f'):  # Mientras haya fuego activo ('0')
+   # --- BUCLE PRINCIPAL ---
+    while np.any(A_terreno == 'f'):
         A_terreno_nueva = A_terreno.copy()
-        
-        # Encontrar celdas quemando ('0')
         quemando = np.where(A_terreno == 'f')
-        for i, j in zip(quemando[0], quemando[1]):
-            # Para cada dirección de propagación
+        coords_quemando = list(zip(quemando[0], quemando[1]))
+
+        for i, j in coords_quemando:
+            # 1. Determinar Potencial Emisor de la casilla que quema (i, j)
+            c = A_contador[i, j]
+            p_emisor = 0
+            
+            # Intervalos según tus instrucciones (con solapamientos)
+            if 7 <= c <= 10:
+                p_emisor += (A_pq1[i, j] / 2)
+            if 4 <= c <= 8:
+                p_emisor += (A_pq2[i, j] / 3)
+            if 0 <= c <= 7:
+                p_emisor += (A_pq3[i, j] / 6)
+
+            # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
                 ni, nj = i + di, j + dj
+                
+                # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
-                    # Calcular la pendiente en esta dirección específica
-                    # tan(φ) = dz / distancia_horizontal
-
+                    
+                    # Pendiente y Beta (del terreno destino)
                     dz = A_altitud[ni, nj] - A_altitud[i, j]
-                    tan_phi = dz / dist  # Puede ser positivo (subida) o negativo (bajada)
-
-                    # Obtener beta según el tipo de terreno en la celda destino
-                    tipo_terreno = A_terreno[ni, nj]
-                    beta = tabla_beta.get(tipo_terreno, [None])[0]
+                    tan_phi = dz / dist
+                    tipo_terreno_ni = A_terreno[ni, nj]
+                    beta = tabla_beta.get(tipo_terreno_ni, [None])[0]
 
                     if tan_phi <= 0 or beta is None:
-                        # Terreno plano, bajada o beta indefinido: no se aplica factor adicional
                         phi_s = 1
                     else:
-                        # Terreno en subida y beta definido: incrementa el potencial
                         phi_s = 1 + (5.275 * (beta ** (-0.3)) * (tan_phi ** 2))
-
-                    # Potencial efectivo con factor de pendiente
-                    potencial_efectivo = A_potencial[ni, nj] * phi_s
                     
-                    # Comparar potencial efectivo con resistencia
-                    if  A_resistencias[ni, nj] - potencial_efectivo <= 0:
-                        A_terreno_nueva[ni, nj] = 'f'  # Se quema
-                    else:
-                        A_resistencias[ni, nj] = A_resistencias[ni, nj] - potencial_efectivo
-        
-        # Cambiar las celdas que estaban quemando ('0') a ya quemado ('1')
-        A_terreno_nueva[A_terreno == 'f'] = '98'
+                    potencial_efectivo = p_emisor * phi_s
+                    
+                    # Restar a la resistencia de la casilla colindante
+                    A_resistencias[ni, nj] -= potencial_efectivo
+                    
+                    # Si se agota la energía de activación, empieza a arder
+                    if A_resistencias[ni, nj] <= 0:
+                        A_terreno_nueva[ni, nj] = 'f'
+
+            # 3. Restar al contador de la casilla que está ardiendo
+            A_contador[i, j] -= 1
+            
+            # 4. Si el contador se agota, la casilla se apaga
+            if A_contador[i, j] < 0:
+                A_terreno_nueva[i, j] = '98'
         
         A_terreno = A_terreno_nueva
         A_terreno_list.append(A_terreno.copy())
         
-        # Si no hay cambios nuevos, salir
         if not np.any(A_terreno == 'f'):
             break
-    
-    # --- 4. GUARDAR RESULTADOS CON FORMATO SOLICITADO ---
+
+    # --- GUARDAR RESULTADOS ---
     def formatear_matriz(matriz):
         return "\n".join([" ".join(map(str, fila)) for fila in matriz])
 
     with open(nombre_archivo_salida, 'w') as f_out:
+        # El primer estado
         f_out.write(formatear_matriz(A_terreno_list[0]))
         f_out.write("\n\n")
-        
-        for idx, paso in enumerate(A_terreno_list[1:]):
+        # Los siguientes pasos de tiempo
+        for paso in A_terreno_list[1:]:
             f_out.write(formatear_matriz(paso))
             f_out.write("\n\n")
 
     print(f"Simulación finalizada. Resultados en '{nombre_archivo_salida}'")
 
-# Ejemplo de llamada:
 #avance_fuego('salida.txt', 'evolucion_fuego.txt')

@@ -11,8 +11,8 @@ def main():
     archivo_4_matrices = 'test_4Matrices.txt'        # Suelo + Altitud + Ea + Pq
     archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
     archivo_video = 'simulacion_incendio'     # Nombre del video final (sin .mp4)
-    
-    
+    temp_amb = 25.3#del dia q toca caluclar 
+    m=0.77 #del dia q toca calcular
     matriz_ffmc = pd.read_csv('csv/dades_inicials.csv', header=None).values
     matriz_bui = pd.read_csv('csv/dades_inicials.csv', header=None).iloc[:, :-1].values
     
@@ -35,8 +35,8 @@ def main():
     # --- 3. GENERAR VIDEO DE LA SIMULACIÓN (mapa) ---
     print("\n=== PASO 3: Generando Video ===")
     # wx, wy son la dirección del viento para la flecha visual
-    viento_x = 1
-    viento_y = 1
+    viento_x = 0
+    viento_y = 0
     mapa.generar_video_incendio(archivo_evolucion, archivo_video, viento_x, viento_y)
 
     print("\n==============================================")

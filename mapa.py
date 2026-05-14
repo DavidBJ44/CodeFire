@@ -16,64 +16,64 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     suelos_info = {
     # MODELOS TIPO PASTIZAL (GR) - Amarillos
 
-        '101': {'id': 0, 'label': 'GR1', 'color': '#FFFFE0'},
-        '102': {'id': 1, 'label': 'GR2', 'color': '#FFFACD'},
-        '103': {'id': 2, 'label': 'GR3', 'color': '#FFF59D'},
-        '104': {'id': 3, 'label': 'GR4', 'color': '#FFEE58'},
-        '105': {'id': 4, 'label': 'GR5', 'color': '#FDD835'},
-        '106': {'id': 5, 'label': 'GR6', 'color': '#FBC02D'},
-        '107': {'id': 6, 'label': 'GR7', 'color': '#F9A825'},
-        '108': {'id': 7, 'label': 'GR8', 'color': '#F57F17'},
-        '109': {'id': 8, 'label': 'GR9', 'color': '#E65100'},
+        '101': {'id': 0, 'label': 'GR1', 'color': "#EBEB38"},
+        '102': {'id': 1, 'label': 'GR2', 'color': "#EBEB38"},
+        '103': {'id': 2, 'label': 'GR3', 'color': '#EBEB38'},
+        '104': {'id': 3, 'label': 'GR4', 'color': '#EBEB38'},
+        '105': {'id': 4, 'label': 'GR5', 'color': '#EBEB38'},
+        '106': {'id': 5, 'label': 'GR6', 'color': '#EBEB38'},
+        '107': {'id': 6, 'label': 'GR7', 'color': '#EBEB38'},
+        '108': {'id': 7, 'label': 'GR8', 'color': '#EBEB38'},
+        '109': {'id': 8, 'label': 'GR9', 'color': '#EBEB38'},
     # MODELOS TIPO PASTIZAL-MATORRAL (GS) - Naranjas
-        '121': {'id': 9, 'label': 'GS1', 'color':  '#FFCC80'},
-        '122': {'id': 10, 'label': 'GS2', 'color': '#FFB74D'},
-        '123': {'id': 11, 'label': 'GS3', 'color': '#FFA726'},
-        '124': {'id': 12, 'label': 'GS4', 'color': '#FB8C00'},
+        '121': {'id': 9, 'label': 'GS1', 'color':  "#F39200"},
+        '122': {'id': 10, 'label': 'GS2', 'color': '#F39200'},
+        '123': {'id': 11, 'label': 'GS3', 'color': '#F39200'},
+        '124': {'id': 12, 'label': 'GS4', 'color': '#F39200'},
     # MODELOS TIPO MATORRAL (SH) - Verdes Claros
-        '141': {'id': 13, 'label': 'SH1', 'color': '#E8F5E9'},
-        '142': {'id': 14, 'label': 'SH2', 'color': '#C8E6C9'},
-        '143': {'id': 15, 'label': 'SH3', 'color': '#A5D6A7'},
-        '144': {'id': 16, 'label': 'SH4', 'color': '#81C784'},
-        '145': {'id': 17, 'label': 'SH5', 'color': '#66BB6A'},
-        '146': {'id': 18, 'label': 'SH6', 'color': '#4CAF50'},
-        '147': {'id': 19, 'label': 'SH7', 'color': '#43A047'},
-        '148': {'id': 20, 'label': 'SH8', 'color': '#388E3C'},
-        '149': {'id': 21, 'label': 'SH9', 'color': "#E6E6E6"},
+        '141': {'id': 13, 'label': 'SH1', 'color': '#44C949'},
+        '142': {'id': 14, 'label': 'SH2', 'color': "#44C949"},
+        '143': {'id': 15, 'label': 'SH3', 'color': '#44C949'},
+        '144': {'id': 16, 'label': 'SH4', 'color': '#44C949'},
+        '145': {'id': 17, 'label': 'SH5', 'color': '#44C949'},
+        '146': {'id': 18, 'label': 'SH6', 'color': '#44C949'},
+        '147': {'id': 19, 'label': 'SH7', 'color': '#44C949'},
+        '148': {'id': 20, 'label': 'SH8', 'color': '#44C949'},
+        '149': {'id': 21, 'label': 'SH9', 'color': "#44C949"},
     # MODELOS BOSQUE: MADERA-SOTOBOSQUE (TU) - Verdes Oscuros / Oliva
-        '161': {'id': 22, 'label': 'TU1', 'color': '#556B2F'},
-        '162': {'id': 23, 'label': 'TU2', 'color': '#4B5320'},
-        '163': {'id': 24, 'label': 'TU3', 'color': '#3D441E'},
-        '164': {'id': 25, 'label': 'TU4', 'color': '#2E3316'},
-        '165': {'id': 26, 'label': 'TU5', 'color': '#1F220E'},
+        '161': {'id': 22, 'label': 'TU1', 'color': "#5D7732"},
+        '162': {'id': 23, 'label': 'TU2', 'color': '#475A27'},
+        '163': {'id': 24, 'label': 'TU3', 'color': '#475A27'},
+        '164': {'id': 25, 'label': 'TU4', 'color': '#475A27'},
+        '165': {'id': 26, 'label': 'TU5', 'color': '#475A27'},
     # MODELOS BOSQUE: HOJARASCA (TL) - Verdes Oscuros Azulados
-        '181': {'id': 27, 'label': 'TL1', 'color': '#2E7D32'},
-        '182': {'id': 28, 'label': 'TL2', 'color': '#1B5E20'},
-        '183': {'id': 29, 'label': 'TL3', 'color': '#004D40'},
-        '184': {'id': 30, 'label': 'TL4', 'color': '#00332E'},
-        '185': {'id': 31, 'label': 'TL5', 'color': '#00251A'},
-        '186': {'id': 32, 'label': 'TL6', 'color': '#1A237E'},
-        '187': {'id': 33, 'label': 'TL7', 'color': '#0D47A1'},
-        '188': {'id': 34, 'label': 'TL8', 'color': '#01579B'},
-        '189': {'id': 35, 'label': 'TL9', 'color': "#002C04"},
+        '181': {'id': 27, 'label': 'TL1', 'color': '#01410E'},
+        '182': {'id': 28, 'label': 'TL2', 'color': '#01410E'},
+        '183': {'id': 29, 'label': 'TL3', 'color': "#01410E"},
+        '184': {'id': 30, 'label': 'TL4', 'color': "#01410E"},
+        '185': {'id': 31, 'label': 'TL5', 'color': '#01410E'},
+        '186': {'id': 32, 'label': 'TL6', 'color': '#01410E'},
+        '187': {'id': 33, 'label': 'TL7', 'color': '#01410E'},
+        '188': {'id': 34, 'label': 'TL8', 'color': '#01410E'},
+        '189': {'id': 35, 'label': 'TL9', 'color': "#01410E"},
     # MODELOS MADERA DERRIBADA (SB) - Marrones/Tierras (por ser restos muertos)
-        '201': {'id': 36, 'label': 'SB1', 'color': '#D7CCC8'},
-        '202': {'id': 37, 'label': 'SB2', 'color': '#A1887F'},
-        '203': {'id': 38, 'label': 'SB3', 'color': '#795548'},
-        '204': {'id': 39, 'label': 'SB4', 'color': '#3E2723'},
+        '201': {'id': 36, 'label': 'SB1', 'color': "#762D12"},
+        '202': {'id': 37, 'label': 'SB2', 'color': '#762D12'},
+        '203': {'id': 38, 'label': 'SB3', 'color': '#762D12'},
+        '204': {'id': 39, 'label': 'SB4', 'color': '#762D12'},
         # Especiales
-        'f': {'id': 41, 'label': 'Fuego Activo', 'color': 'red'},
+        'f': {'id': 41, 'label': 'Fuego Activo', 'color': "#FF0000"},
         '0': {'id': 42, 'label': 'Agua', 'color': "#3030AC"},
     # MODELOS NO COMBUSTIBLES (NB - Non-Burnable)
-        '91': {'id': 43, 'label': 'NB1', 'color': '#424242'}, # Urbano/Infraestructuras (Asfalto, edificios)
-        '92': {'id': 44, 'label': 'NB2', 'color': '#E0E0E0'}, # Suelo desnudo (Roca, arena, canteras)
+        '91': {'id': 43, 'label': 'NB1', 'color': "#676767"}, # Urbano/Infraestructuras (Asfalto, edificios)
+        '92': {'id': 44, 'label': 'NB2', 'color': '#676767'}, # Suelo desnudo (Roca, arena, canteras)
         '93': {'id': 45, 'label': 'NB3', 'color': '#3030AC'}, # Agua (Ríos, lagos, canales, mar)
         '94': {'id': 46, 'label': 'NB4', 'color': '#3030AC'}, # Zonas húmedas (Tierras bajas inundadas, humedales)
         '95': {'id': 47, 'label': 'NB5', 'color': '#3030AC'}, # Agua profunda / Masas de agua permanentes
         '96': {'id': 48, 'label': 'NB6', 'color': '#FFFFFF'}, # Nieve / Hielo (Cumbres nevadas o glaciares)
-        '97': {'id': 49, 'label': 'NB7', 'color': '#BDBDBD'}, # Otros (Uso genérico para huecos sin datos)
-        '98': {'id': 50, 'label': 'Quemado (NB8)', 'color': '#212121'}, # Terreno quemado recientemente (sin vegetación)
-        '99': {'id': 51, 'label': 'NB9', 'color': '#757575'}, # Código genérico de "No Combustible"
+        '97': {'id': 49, 'label': 'NB7', 'color': '#676767'}, # Otros (Uso genérico para huecos sin datos)
+        '98': {'id': 50, 'label': 'Quemado (NB8)', 'color': "#000000"}, # Terreno quemado recientemente (sin vegetación)
+        '99': {'id': 51, 'label': 'NB9', 'color': '#676767'}, # Código genérico de "No Combustible"
         }
     
     # 2. Leer archivo
