@@ -125,7 +125,7 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     if wx != 0 or wy != 0:
         # 1. Definimos la posición base (Centro del lateral izquierdo)
         # x=0.05 está muy cerca del borde izquierdo, y=0.5 es la mitad de la altura
-        base_x, base_y = -0.50, 0.5 
+        base_x, base_y = -0.20, 0.5 
         
         # 2. Definimos la escala (qué tan larga es la flecha)
         # Aumentamos el factor a 0.1 para que sea más grande
@@ -139,16 +139,16 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
                     arrowprops=dict(
                         facecolor='red', 
                         edgecolor='red', 
-                        headwidth=12,   # Punta más ancha
-                        width=6,        # Cuerpo más grueso
+                        headwidth=8,   # Punta más ancha
+                        width=4,        # Cuerpo más grueso
                         alpha=0.9       # Casi opaco para que se vea bien
                     ))
         
         # 4. Texto "Viento" en rojo y un poco más grande
-        ax.text(base_x, base_y - 0.12, 'Direcció Vent', 
+        ax.text(base_x, base_y - 0.08, 'Direcció Vent', 
                 transform=ax.transAxes, 
                 color='red', 
-                fontsize=14, 
+                fontsize=12, 
                 fontweight='bold', 
                 ha='center')
         
@@ -163,7 +163,7 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
                 clip_on=False)
         
     # Ajustamos el margen izquierdo para que la flecha no se vea "apretada"
-    plt.subplots_adjust(top=0.88, right=0.8, left=0.15)
+    plt.subplots_adjust(top=0.88, right=0.8, left=0.25)
 
     def update(frame):
         ax.set_title(f"Simulación de Propagación de Fuego - Paso {frame}", fontsize=16)
