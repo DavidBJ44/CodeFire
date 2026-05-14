@@ -26,6 +26,69 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
         print(f"Error al leer el archivo: {e}")
         return
 
+    tabla_beta = {
+    '0':  [None], #terreno urbano 
+    '91': [None], # Urbano
+    '92': [None], # Roca
+    '93': [None], # Agua
+    '94': [None], # Humedales
+    '95': [None], # Agua profunda
+    '96': [None], # Nieve
+    '97': [None], # Otros
+    '98': [None], # Quemado
+    '99': [None], # Genérico NB
+    # MODELOS TIPO PASTIZAL (GR)
+    '101': [0.00143], # GR1
+    '102': [0.00158], # GR2
+    '103': [0.00143], # GR3
+    '104': [0.00154], # GR4
+    '105': [0.00277], # GR5
+    '106': [0.00335], # GR6
+    '107': [0.00306], # GR7
+    '108': [0.00316], # GR8
+    '109': [0.00316], # GR9
+
+    # MODELOS TIPO PASTIZAL-MATORRAL (GS)
+    '121': [0.00215], # GS1
+    '122': [0.00249], # GS2
+    '123': [0.00259], # GS3
+    '124': [0.00874], # GS4
+
+    # MODELOS TIPO MATORRAL (SH)
+    '141': [0.00280], # SH1
+    '142': [0.01198], # SH2
+    '143': [0.00577], # SH3
+    '144': [0.00227], # SH4
+    '145': [0.00206], # SH5
+    '146': [0.00412], # SH6
+    '147': [0.00344], # SH7
+    '148': [0.00509], # SH8
+    '149': [0.00505], # SH9
+
+    # MODELOS TIPO MADERA-SOTOBOSQUE (TU)
+    '161': [0.00885], # TU1
+    '162': [0.00603], # TU2
+    '163': [0.00359], # TU3
+    '164': [0.01865], # TU4
+    '165': [0.02009], # TU5
+
+    # MODELOS TIPO HOJARASCA-SOTOBOSQUE (TL)
+    '181': [0.04878], # TL1
+    '182': [0.04232], # TL2
+    '183': [0.02630], # TL3
+    '184': [0.02224], # TL4
+    '185': [0.01925], # TL5
+    '186': [0.02296], # TL6
+    '187': [0.03515], # TL7
+    '188': [0.03969], # TL8
+    '189': [0.03372], # TL9
+
+    # MODELOS TIPO MADERA DERRIBADA (SB)
+    '201': [0.02224], # SB1
+    '202': [0.01829], # SB2
+    '203': [0.01345], # SB3
+    '204': [0.00744], # SB4
+    }
     n, m = A_terreno.shape
     cell_size = 20.0
     
@@ -64,12 +127,17 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
                     dz = A_altitud[ni, nj] - A_altitud[i, j]
                     tan_phi = dz / dist  # Puede ser positivo (subida) o negativo (bajada)
 
-                    if tan_phi <= 0:
-                        phi_s = 1  # Terreno plano o bajada: el potencial se queda igual
+                    # Obtener beta según el tipo de terreno en la celda destino
+                    tipo_terreno = A_terreno[ni, nj]
+                    beta = tabla_beta.get(tipo_terreno, [None])[0]
+
+                    if tan_phi <= 0 or beta is None:
+                        # Terreno plano, bajada o beta indefinido: no se aplica factor adicional
+                        phi_s = 1
                     else:
-                        # Terreno en subida: sumamos 1 para que el potencial aumente
-                        phi_s = 1 + (5.275 * (tan_phi ** 2))
-                    
+                        # Terreno en subida y beta definido: incrementa el potencial
+                        phi_s = 1 + (5.275 * (beta ** (-0.3)) * (tan_phi ** 2))
+
                     # Potencial efectivo con factor de pendiente
                     potencial_efectivo = A_potencial[ni, nj] * phi_s
                     
