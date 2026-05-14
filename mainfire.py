@@ -1,6 +1,9 @@
 import F_RP
 import fire2
 import mapa
+import ffmc
+import bui
+import pandas as pd
 
 def main():
     # --- CONFIGURACIÓN DE ARCHIVOS ---
@@ -8,17 +11,18 @@ def main():
     archivo_4_matrices = 'test_4Matrices.txt'        # Suelo + Altitud + Ea + Pq
     archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
     archivo_video = 'simulacion_incendio'     # Nombre del video final (sin .mp4)
-
+    
+    
+    matriz_ffmc = pd.read_csv('csv/dades_inicials.csv', header=None).values
+    matriz_bui = pd.read_csv('csv/dades_inicials.csv', header=None).iloc[:, :-1].values
+    
     # --- 1. GENERAR DICCIONARIO Y MATRICES DE ENERGÍA (F_RP) ---
     print("=== PASO 1: Generando Diccionario de Combustibles ===")
-    # Parámetros ambientales (puedes cambiarlos aquí)
-    ffmc = 85
-    bui = 60
-    temp_amb = 35
-    m =0.8
+    
+
     
     # Generamos el diccionario { 'ID': [ea, pq] }
-    diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc, bui, temp_amb,m)
+    diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc.calcular_ffmc(matriz_ffmc), bui.calcular_bui(matriz_bui), temp_amb,m)
     
     # Generamos el archivo que combina las 4 matrices necesarias
     F_RP.Gen_e_q_m(archivo_inicial, archivo_4_matrices, diccionario_fuego)

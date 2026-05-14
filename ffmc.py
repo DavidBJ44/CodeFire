@@ -37,7 +37,6 @@ def calcular_ffmc(matriz):
         if R > 0.59:
             ffmc = RainCode(ffmc, R)
         ffmc = table2(T, H, W, ffmc)
-        print(f"Day {dia+1}: FFMC = {ffmc:.2f}")
     return ffmc
 
 def table2(temperatura, humedad, viento, ffmc_actual):

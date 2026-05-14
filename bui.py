@@ -24,7 +24,6 @@ def calcular_bui(matriz):
                 dmc += table4(T, H)
                 dc += table6(T)
             bui = table8(dmc, dc)
-            print(f"Day {dia+1}: BUI = {bui:.2f}  DMC = {dmc:.2f}  DC = {dc:.2f}")
     
     else:
         for dia in range(primera_fila, 31):
@@ -38,7 +37,6 @@ def calcular_bui(matriz):
                 dmc += table4(T, H)
                 dc += table6(T)
             bui = table8(dmc, dc)
-            print(f"Day {dia+1}: BUI = {bui:.2f}  DMC = {dmc:.2f}  DC = {dc:.2f}")
     return bui
 
 
