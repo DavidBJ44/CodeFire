@@ -132,7 +132,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
             if 4 <= c <= 8:
                 p_emisor += (A_pq2[i, j] / 3)
             if 0 <= c <= 7:
-                p_emisor += (A_pq3[i, j] / 6)
+                p_emisor += (A_pq3[i, j] / 7)
 
             # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
@@ -150,8 +150,11 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
                     if tan_phi <= 0 or beta is None:
                         phi_s = 1
                     else:
-                        phi_s = 1 + (5.275 * (beta ** (-0.3)) * (tan_phi ** 2))
-                    
+                        if tan_phi >= 1:
+                            phi_s = 1 + (5.275 * (beta ** (-0.3)) * (1 ** 2))
+                        else:
+                            phi_s = 1 + (5.275 * (beta ** (-0.3)) * (tan_phi ** 2))
+
                     potencial_efectivo = p_emisor * phi_s
                     
                     # Restar a la resistencia de la casilla colindante
