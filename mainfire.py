@@ -11,6 +11,8 @@ def main():
     archivo_4_matrices = 'test_4Matrices.txt'        # Suelo + Altitud + Ea + Pq
     archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
     archivo_video = 'simulacion_incendio'     # Nombre del video final (sin .mp4)
+    velocidad_viento = 10 #km/h
+    direccion_viento = (1,0)
     temp_amb = 25.3#del dia q toca caluclar 
     m=0.77 #del dia q toca calcular
     matriz_ffmc = pd.read_csv('csv/dades_inicials.csv', header=None).values
@@ -30,7 +32,7 @@ def main():
     # --- 2. EJECUTAR SIMULACIÓN DE AVANCE (fire2) ---
     print("\n=== PASO 2: Simulación de Avance del Fuego ===")
     # Nota: fire2 pedirá por consola las coordenadas X e Y de inicio
-    fire2.avance_fuego(archivo_4_matrices, archivo_evolucion)
+    fire2.avance_fuego(archivo_4_matrices, archivo_evolucion, velocidad_viento, direccion_viento)
 
     # --- 3. GENERAR VIDEO DE LA SIMULACIÓN (mapa) ---
     print("\n=== PASO 3: Generando Video ===")

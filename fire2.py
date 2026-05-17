@@ -1,8 +1,9 @@
 import numpy as np
+import math
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
-def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
+def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento, direccion_viento):
         # --- 1. LEER Y CARGAR LAS 4 MATRICES ---
     try:
         with open(nombre_archivo_entrada, 'r') as f:
@@ -141,7 +142,6 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
                 
                 # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
-                    
                     # Pendiente y Beta (del terreno destino)
                     dz = A_altitud[ni, nj] - A_altitud[i, j]
                     tan_phi = dz / dist
@@ -155,6 +155,21 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
                             phi_s = 1 + (5.275 * (beta ** (-0.3)) * (1 ** 2))
                         else:
                             phi_s = 1 + (5.275 * (beta ** (-0.3)) * (tan_phi ** 2))
+                    
+                    # Viento 
+                    sigma = beta = tabla_beta.get(tipo_terreno_ni, [None])[1]
+                    if sigma is None:
+                        viento_factor = 1
+                    else:
+                        C = 7.47 * exp(-0.133 * (sigma ** 0.55 ))
+                        B = 0.02526 * (sigma ** 0.54)
+                        E = 0.715 * exp(-0.000359 * sigma)
+                        beta_opt = 3.348 * (sigma ** -0.8189)
+                        U = velocidad_viento * 54.68 # Convertir de km/h a ft/min
+                        angulo_viento = math.atan2(direccion_viento[1], direccion_viento[0])  # Ángulo del viento en radianes
+                        angulo_fuego = math.atan2(dj, di)  # Ángulo del fuego en radianes
+                        U_efectivo = U * cos(angulo_viento - angulo_fuego)  # Componente del viento en la dirección del fuego
+                        phi_v = C * (U_efectivo**B) * ((beta/beta_opt) ** (-E)) 
 
                     potencial_efectivo = p_emisor * phi_s
                     
@@ -192,5 +207,5 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida):
             f_out.write("\n\n")
 
     print(f"Simulación finalizada. Resultados en '{nombre_archivo_salida}'")
-
+  
 #avance_fuego('salida.txt', 'evolucion_fuego.txt')
