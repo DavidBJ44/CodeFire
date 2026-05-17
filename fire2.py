@@ -130,9 +130,9 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
             
             # Intervalos según tus instrucciones (con solapamientos)
             if 7 <= c <= 10:
-                p_emisor += (A_pq1[i, j] / 2)
+                p_emisor += (A_pq1[i, j] / 3)
             if 4 <= c <= 8:
-                p_emisor += (A_pq2[i, j] / 3)
+                p_emisor += (A_pq2[i, j] / 4)
             if 0 <= c <= 7:
                 p_emisor += (A_pq3[i, j] / 7)
 

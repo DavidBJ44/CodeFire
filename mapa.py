@@ -62,18 +62,18 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
         '203': {'id': 38, 'label': 'SB3', 'color': '#762D12'},
         '204': {'id': 39, 'label': 'SB4', 'color': '#762D12'},
         # Especiales
-        'f': {'id': 41, 'label': 'Fuego Activo', 'color': "#FF0000"},
-        '0': {'id': 42, 'label': 'Agua', 'color': "#3030AC"},
+        'f': {'id': 40, 'label': 'Fuego Activo', 'color': "#FF0000"},
+        '0': {'id': 41, 'label': 'Agua', 'color': "#3030AC"},
     # MODELOS NO COMBUSTIBLES (NB - Non-Burnable)
-        '91': {'id': 43, 'label': 'NB1', 'color': "#676767"}, # Urbano/Infraestructuras (Asfalto, edificios)
-        '92': {'id': 44, 'label': 'NB2', 'color': '#676767'}, # Suelo desnudo (Roca, arena, canteras)
-        '93': {'id': 45, 'label': 'NB3', 'color': '#3030AC'}, # Agua (Ríos, lagos, canales, mar)
-        '94': {'id': 46, 'label': 'NB4', 'color': '#3030AC'}, # Zonas húmedas (Tierras bajas inundadas, humedales)
-        '95': {'id': 47, 'label': 'NB5', 'color': '#3030AC'}, # Agua profunda / Masas de agua permanentes
-        '96': {'id': 48, 'label': 'NB6', 'color': '#FFFFFF'}, # Nieve / Hielo (Cumbres nevadas o glaciares)
-        '97': {'id': 49, 'label': 'NB7', 'color': '#676767'}, # Otros (Uso genérico para huecos sin datos)
-        '98': {'id': 50, 'label': 'Quemado (NB8)', 'color': "#000000"}, # Terreno quemado recientemente (sin vegetación)
-        '99': {'id': 51, 'label': 'NB9', 'color': '#676767'}, # Código genérico de "No Combustible"
+        '91': {'id': 42, 'label': 'NB1', 'color': "#676767"}, # Urbano/Infraestructuras (Asfalto, edificios)
+        '92': {'id': 43, 'label': 'NB2', 'color': '#676767'}, # Suelo desnudo (Roca, arena, canteras)
+        '93': {'id': 44, 'label': 'NB3', 'color': '#3030AC'}, # Agua (Ríos, lagos, canales, mar)
+        '94': {'id': 45, 'label': 'NB4', 'color': '#3030AC'}, # Zonas húmedas (Tierras bajas inundadas, humedales)
+        '95': {'id': 46, 'label': 'NB5', 'color': '#3030AC'}, # Agua profunda / Masas de agua permanentes
+        '96': {'id': 47, 'label': 'NB6', 'color': '#FFFFFF'}, # Nieve / Hielo (Cumbres nevadas o glaciares)
+        '97': {'id': 48, 'label': 'NB7', 'color': '#676767'}, # Otros (Uso genérico para huecos sin datos)
+        '98': {'id': 49, 'label': 'Quemado (NB8)', 'color': "#000000"}, # Terreno quemado recientemente (sin vegetación)
+        '99': {'id': 50, 'label': 'NB9', 'color': '#676767'}, # Código genérico de "No Combustible"
         }
     
     # 2. Leer archivo
@@ -179,4 +179,4 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     ani.save(nombre_salida, writer=writer)
     print("¡Proceso finalizado con éxito!")
 #ejemplo uso 
-#generar_video_incendio('evolucion_fuego.txt','mat_text_out',1,1)
+generar_video_incendio('test_evolucion_fuego.txt','mat_text_out',1,1)
