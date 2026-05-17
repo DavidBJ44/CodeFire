@@ -171,7 +171,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                         U_efectivo = U * cos(angulo_viento - angulo_fuego)  # Componente del viento en la dirección del fuego
                         phi_v = C * (U_efectivo**B) * ((beta/beta_opt) ** (-E)) 
 
-                    potencial_efectivo = p_emisor * phi_s * phi_v
+                    potencial_efectivo = p_emisor * (1 + phi_s + phi_v)
                     
                     # Restar a la resistencia de la casilla colindante
                     A_resistencias[ni, nj] -= potencial_efectivo
