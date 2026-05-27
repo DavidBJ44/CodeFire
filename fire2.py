@@ -149,7 +149,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     beta = tabla_beta.get(tipo_terreno_ni, [None])[0]
 
                     if tan_phi <= 0 or beta is None:
-                        phi_s = 1
+                        phi_s = 0
                     else:
                         if tan_phi >= 1:
                             phi_s = (5.275 * (beta ** (-0.3)) * (1 ** 2))
@@ -159,7 +159,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     # Viento 
                     sigma = beta = tabla_beta.get(tipo_terreno_ni, [None])[1]
                     if sigma is None:
-                        viento_factor = 1
+                        phi_v = 0
                     else:
                         C = 7.47 * math.exp(-0.133 * (sigma ** 0.55 ))
                         B = 0.02526 * (sigma ** 0.54)
