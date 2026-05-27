@@ -1,5 +1,5 @@
 import numpy as np
-import math
+import math 
 # Añade esto al principio del archivo, después de los imports
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
@@ -161,20 +161,20 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     if sigma is None:
                         viento_factor = 1
                     else:
-                        C = 7.47 * exp(-0.133 * (sigma ** 0.55 ))
+                        C = 7.47 * math.exp(-0.133 * (sigma ** 0.55 ))
                         B = 0.02526 * (sigma ** 0.54)
-                        E = 0.715 * exp(-0.000359 * sigma)
+                        E = 0.715 * math.exp(-0.000359 * sigma)
                         beta_opt = 3.348 * (sigma ** -0.8189)
                         U = velocidad_viento * 54.68 # Convertir de km/h a ft/min
                         angulo_viento = math.atan2(direccion_viento[1], direccion_viento[0])  # Ángulo del viento en radianes
                         angulo_fuego = math.atan2(dj, di)  # Ángulo del fuego en radianes
-                        U_efectivo = U * cos(angulo_viento - angulo_fuego)  # Componente del viento en la dirección del fuego
+                        U_efectivo = U * math.cos(angulo_viento - angulo_fuego)  # Componente del viento en la dirección del fuego
                         phi_v = C * (U_efectivo**B) * ((beta/beta_opt) ** (-E)) 
 
                     potencial_efectivo = p_emisor * (1 + phi_s + phi_v)
                     
                     # Restar a la resistencia de la casilla colindante
-                    A_resistencias[ni, nj] -= potencial_efectivo
+                    A_resistencias[ni, nj] -= potencial_efectivo.real
                     
                     # Si se agota la energía de activación, empieza a arder
                     if A_resistencias[ni, nj] <= 0:

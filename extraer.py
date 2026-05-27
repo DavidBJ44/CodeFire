@@ -13,16 +13,12 @@ def leer_asc(ruta_archivo):
     return datos, int(header['nrows']), int(header['ncols'])
 
 def formatear_matriz(matriz):
-    # Convierte la matriz a lista de listas y le da el formato visual con corchetes
-    lista = matriz.tolist()
+    # Esto genera filas de números limpios separados por espacios
     lineas = []
-    for i, fila in enumerate(lista):
-        if i == 0:
-            lineas.append(f"[{fila}")
-        elif i == len(lista) - 1:
-            lineas.append(f" {fila}]")
-        else:
-            lineas.append(f" {fila}")
+    for fila in matriz:
+        # Convertimos a int para quitar el .0 y luego a string unidos por espacio
+        linea_texto = " ".join(map(str, fila.astype(int)))
+        lineas.append(linea_texto)
     return "\n".join(lineas)
 
 def ejecutar_proceso(archivo1, archivo2, salida_txt):
@@ -53,4 +49,4 @@ def ejecutar_proceso(archivo1, archivo2, salida_txt):
     print(f"\nLas matrices han sido guardadas en: {salida_txt}")
 
 # --- CONFIGURACIÓN ---
-ejecutar_proceso('recorte_combustible.asc', 'recorte_altitud.asc', 'matrices_solo.txt')
+ejecutar_proceso('mini_mapa_terr.asc', 'mini_mapa_alt.asc', 'matrices_solo.txt')

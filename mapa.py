@@ -109,27 +109,28 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     colores_lista = [info['color'] for info in suelos_info.values()]
     cmap_personalizado = mcolors.ListedColormap(colores_lista)
     
-    fig, ax = plt.subplots(figsize=(12, 9))
+    fig, ax = plt.subplots(figsize=(14 ,8))
     
     # Crear la imagen inicial
     im = ax.imshow(matrices_numericas[0], cmap=cmap_personalizado, vmin=0, vmax=51)
     ax.grid(which='major', axis='both', linestyle='-', color='white', linewidth=0.2)
-    ax.set_xticks(np.arange(-.5, columnas, 1))
-    ax.set_yticks(np.arange(-.5, filas, 1))
+    ax.set_xticks([])
+    ax.set_yticks([])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     
     parches = [mpatches.Patch(color=info['color'], label=info['label']) for info in suelos_info.values()]
-    ax.legend(handles=parches, bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='x-small', ncol=2)
+    # Movemos la leyenda un poco para que no coma tanto espacio
+    ax.legend(handles=parches, bbox_to_anchor=(1.02, 1), loc='upper left', fontsize='xx-small', ncol=2)
+    
     
     if wx != 0 or wy != 0:
         # 1. Definimos la posición base (Centro del lateral izquierdo)
         # x=0.05 está muy cerca del borde izquierdo, y=0.5 es la mitad de la altura
-        base_x, base_y = -0.20, 0.5 
-        
+        base_x, base_y = -0.12, 0.5 
+        escala = 0.08         
         # 2. Definimos la escala (qué tan larga es la flecha)
         # Aumentamos el factor a 0.1 para que sea más grande
-        escala = 0.1 
         
         # 3. Dibujamos la flecha en ROJO
         ax.annotate('', 
@@ -163,20 +164,26 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
                 clip_on=False)
         
     # Ajustamos el margen izquierdo para que la flecha no se vea "apretada"
-    plt.subplots_adjust(top=0.88, right=0.8, left=0.25)
+    plt.subplots_adjust(top=0.9, bottom=0.1, right=0.85, left=0.15)
 
     def update(frame):
-        ax.set_title(f"Simulación de Propagación de Fuego - Paso {frame}", fontsize=16)
+        # ### CAMBIO 2: Contador de tiempo (5 min por paso)
+        minutos_totales = frame * 5
+        horas = minutos_totales // 60
+        mins = minutos_totales % 60
+        tiempo_str = f"{horas:02d}h {mins:02d}min"
+        
+        ax.set_title(f"Simulación de Propagación de Fuego\nPaso: {frame} | Tiempo transcurrido: {tiempo_str}", fontsize=14)
         im.set_array(matrices_numericas[frame])
         return [im]
 
-
     ani = FuncAnimation(fig, update, frames=len(matrices_numericas), interval=1000, blit=False)
-    plt.subplots_adjust(top=0.88, right=0.8)
+
     # 4. Guardar directamente como MP4 , libreria ffmpeg
     print(f"Generando video MP4: {nombre_salida}...")
-    writer = FFMpegWriter(fps=1)
+    writer = FFMpegWriter(fps=2)
     ani.save(nombre_salida, writer=writer)
     print("¡Proceso finalizado con éxito!")
 #ejemplo uso 
-generar_video_incendio('test_evolucion_fuego.txt','mat_text_out',1,1)
+#generar_video_incendio('test_evolucion_fuego.txt','mat_text_out',1,1)viento_x = 1
+    

@@ -7,12 +7,14 @@ import pandas as pd
 
 def main():
     # --- CONFIGURACIÓN DE ARCHIVOS ---
-    archivo_inicial = 'test_2Matrices.txt'    # Suelo + Altitud
-    archivo_4_matrices = 'test_4Matrices.txt'        # Suelo + Altitud + Ea + Pq
+    archivo_inicial = 'matrices_solo.txt'    # Suelo + Altitud
+    archivo_7_matrices = 'test_7Matrices.txt'        # Suelo + Altitud + Ea + Pq
     archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
     archivo_video = 'simulacion_incendio'     # Nombre del video final (sin .mp4)
-    velocidad_viento = 10 #km/h
-    direccion_viento = (1,0)
+    velocidad_viento = 0 #km/h
+    viento_x = 0
+    viento_y = 0
+    direccion_viento = (viento_x ,viento_y)
     temp_amb = 25.3#del dia q toca caluclar 
     m=0.77 #del dia q toca calcular
     matriz_ffmc = pd.read_csv('csv/dades_inicials.csv', header=None).values
@@ -27,18 +29,17 @@ def main():
     diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc.calcular_ffmc(matriz_ffmc), bui.calcular_bui(matriz_bui), temp_amb,m)
     
     # Generamos el archivo que combina las 4 matrices necesarias
-    F_RP.Gen_e_q_m(archivo_inicial, archivo_4_matrices, diccionario_fuego)
+    F_RP.Gen_e_q_m(archivo_inicial, archivo_7_matrices, diccionario_fuego)
 
     # --- 2. EJECUTAR SIMULACIÓN DE AVANCE (fire2) ---
     print("\n=== PASO 2: Simulación de Avance del Fuego ===")
     # Nota: fire2 pedirá por consola las coordenadas X e Y de inicio
-    fire2.avance_fuego(archivo_4_matrices, archivo_evolucion, velocidad_viento, direccion_viento)
+    fire2.avance_fuego(archivo_7_matrices, archivo_evolucion, velocidad_viento, direccion_viento)
 
     # --- 3. GENERAR VIDEO DE LA SIMULACIÓN (mapa) ---
     print("\n=== PASO 3: Generando Video ===")
     # wx, wy son la dirección del viento para la flecha visual
-    viento_x = 0
-    viento_y = 0
+ 
     mapa.generar_video_incendio(archivo_evolucion, archivo_video, viento_x, viento_y)
 
     print("\n==============================================")
