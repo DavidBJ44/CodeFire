@@ -10,7 +10,7 @@ def main():
     archivo_inicial = 'matrices_solo.txt'    # Suelo + Altitud
     archivo_7_matrices = 'test_7Matrices.txt'        # Suelo + Altitud + Ea + Pq
     archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
-    archivo_video = 'simulacion_incendio'     # Nombre del video final (sin .mp4)
+    archivo_video = 'simulacion_incendio_hivern'     # Nombre del video final (sin .mp4)
     velocidad_viento = 0 #km/h
     viento_x = 0
     viento_y = 0
@@ -26,8 +26,19 @@ def main():
 
     
     # Generamos el diccionario { 'ID': [ea, pq] }
-    diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc.calcular_ffmc(matriz_ffmc), bui.calcular_bui(matriz_bui), temp_amb,m)
-    
+    #diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc.calcular_ffmc(matriz_ffmc), bui.calcular_bui(matriz_bui), temp_amb,m)
+   # --- ESTIU (Catalunya, Risc Extrem - Pla Alfa 3) ---
+    #diccionario_fuego = F_RP.generar_diccionario_fuego(90.0, 90.0, 35.0, 0.5)
+
+## --- PRIMAVERA (Catalunya, Humitat variable) ---
+    #diccionario_fuego = F_RP.generar_diccionario_fuego(65.0, 50.0, 22.0, 0.75)
+#
+## --- TARDOR (Catalunya, Post-estiu sec) ---
+    #diccionario_fuego = F_RP.generar_diccionario_fuego(45.0, 45.0, 18.0, 0.55)
+#
+## --- HIVERN (Catalunya, Fred i humit) ---
+    diccionario_fuego = F_RP.generar_diccionario_fuego(20.0, 10.0, 9.0, 0.85)
+
     # Generamos el archivo que combina las 4 matrices necesarias
     F_RP.Gen_e_q_m(archivo_inicial, archivo_7_matrices, diccionario_fuego)
 
