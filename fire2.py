@@ -99,7 +99,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
     cell_size = 20.0
     
     # Direcciones y sus distancias (para diagonales usamos la hipotenusa)
-    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1/np.sqrt(2), -1/np.sqrt(2)), (-1/np.sqrt(2), 1/np.sqrt(2)), (1/np.sqrt(2), -1/np.sqrt(2)), (1/np.sqrt(2), 1/np.sqrt(2))]
     distancias = [cell_size, cell_size, cell_size, cell_size, cell_size * np.sqrt(2), cell_size * np.sqrt(2), cell_size * np.sqrt(2), cell_size * np.sqrt(2)]
     
     
@@ -111,10 +111,22 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
     if not (0 <= x < n and 0 <= y < m):
         print(f"Error: las coordenadas deben estar dentro de [0-{n-1}, 0-{m-1}]")
         return []
+    # Definir los puntos de la cruz (centro, arriba, abajo, izquierda, derecha)
+    puntos_fuego_inicial = [
+        (x, y),     # Centro
+        (x - 1, y), # Arriba
+        (x + 1, y), # Abajo
+        (x, y - 1), # Izquierda
+        (x, y + 1)  # Derecha
+    ]
     
-    # Inicializar matriz de terreno, cambiar inicial a quemando
-    A_terreno[x, y] = 'f'  # Fuego inicial quemando
-    
+    # Encender los puntos que estén dentro de los límites del mapa
+    for px, py in puntos_fuego_inicial:
+        if 0 <= px < n and 0 <= py < m:
+            # Solo se enciende si no es un terreno no combustible 
+            if A_terreno[px, py] not in ['1', '0', '91', '92', '93', '94', '95', '96', '97', '99']:
+                A_terreno[px, py] = 'f'
+                
     A_terreno_list = [A_terreno.copy()]
     
    # --- BUCLE PRINCIPAL ---
@@ -139,17 +151,18 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
             # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
                 ni, nj = i + di, j + dj
-                
+                pendiente_negativa = 0
                 # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
                     # Pendiente y Beta (del terreno destino)
                     dz = A_altitud[ni, nj] - A_altitud[i, j]
                     tan_alfa = dz / dist
                     if tan_alfa <= 0:
-                        factor_pendiente = 1
-                    else:
-                        alfa = math.atan(tan_alfa) * 180 / np.pi  # Ángulo de la pendiente en grados
-                        factor_pendiente = math.exp(0.069 * alfa)  # Factor de aumento por pendiente
+                        pendiente_negativa = 1
+                        tan_alfa = abs(tan_alfa)
+                    
+                    alfa = math.atan(tan_alfa) * 180 / np.pi  # Ángulo de la pendiente en grados
+                    factor_pendiente = math.exp(0.069 * alfa)  # Factor de aumento por pendiente
                     modulo_pendiente_a_viento = math.log(factor_pendiente) / 0.069  # Convertir de nuevo a alfa para el cálculo del viento
                     if ni == 0 or nj == 0:
                         x_p, y_p = ni * modulo_pendiente_a_viento, nj * modulo_pendiente_a_viento
@@ -161,12 +174,17 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     else:
                         x_v = velocidad_viento / (math.sqrt(1 + ((y_viento / x_viento) ** 2)))
                         y_v = (y_viento / x_viento) * velocidad_viento
+                    if pendiente_negativa == 1:
+                        x_p, y_p = -x_p, -y_p
                     x, y = x_p + x_v, y_p + y_v
                     modulo_viento_total = math.sqrt(x**2 + y**2)
                     factor_final = math.exp(0.05039 * modulo_viento_total)
-                    
+                    cos_a = (x * ni + y * nj) / (modulo_viento_total * 1)
+                    multiplicador_viento = factor_final ** cos_a
+
+                    potencial_efectivo = p_emisor * multiplicador_viento
                     # Restar a la resistencia de la casilla colindante
-                    A_resistencias[ni, nj] -= potencial_efectivo.real
+                    A_resistencias[ni, nj] -= potencial_efectivo
                     
                     # Si se agota la energía de activación, empieza a arder
                     if A_resistencias[ni, nj] <= 0:
