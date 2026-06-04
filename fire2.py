@@ -150,8 +150,8 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
             # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
                 ni, nj = i + di, j + dj
-                nni = ni/math.sqrt(ni**2 + nj**2)
-                nnj = nj/math.sqrt(ni**2 + nj**2)
+                nni = ni/math.sqrt((ni)**2 + (nj)**2)
+                nnj = nj/math.sqrt((ni)**2 + (nj)**2)
                 pendiente_negativa = 0
                 # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
