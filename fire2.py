@@ -99,9 +99,8 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
     cell_size = 20.0
     
     # Direcciones y sus distancias (para diagonales usamos la hipotenusa)
-    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1/math.sqrt(2), -1/math.sqrt(2)), (-1/math.sqrt(2), 1/math.sqrt(2)), (1/math.sqrt(2), -1/math.sqrt(2)), (1/math.sqrt(2), 1/math.sqrt(2))]
-    distancias = [cell_size, cell_size, cell_size, cell_size, cell_size * math.sqrt(2), cell_size * math.sqrt(2), cell_size * math.sqrt(2), cell_size * math.sqrt(2)]
-    
+    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+    distancias = [cell_size, cell_size, cell_size, cell_size, cell_size, cell_size, cell_size, cell_size]
     
     
     x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
@@ -151,6 +150,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
             # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
                 ni, nj = i + di, j + dj
+                ni, nj = ni/math.sqrt(ni**2 + nj**2), nj/math.sqrt(ni**2 + nj**2)  # Normalizar dirección
                 pendiente_negativa = 0
                 # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
