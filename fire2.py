@@ -99,8 +99,8 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
     cell_size = 20.0
     
     # Direcciones y sus distancias (para diagonales usamos la hipotenusa)
-    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1/np.sqrt(2), -1/np.sqrt(2)), (-1/np.sqrt(2), 1/np.sqrt(2)), (1/np.sqrt(2), -1/np.sqrt(2)), (1/np.sqrt(2), 1/np.sqrt(2))]
-    distancias = [cell_size, cell_size, cell_size, cell_size, cell_size * np.sqrt(2), cell_size * np.sqrt(2), cell_size * np.sqrt(2), cell_size * np.sqrt(2)]
+    direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1/math.sqrt(2), -1/math.sqrt(2)), (-1/math.sqrt(2), 1/math.sqrt(2)), (1/math.sqrt(2), -1/math.sqrt(2)), (1/math.sqrt(2), 1/math.sqrt(2))]
+    distancias = [cell_size, cell_size, cell_size, cell_size, cell_size * math.sqrt(2), cell_size * math.sqrt(2), cell_size * math.sqrt(2), cell_size * math.sqrt(2)]
     
     
     
@@ -164,6 +164,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     alfa = math.atan(tan_alfa) * 180 / np.pi  # Ángulo de la pendiente en grados
                     factor_pendiente = math.exp(0.069 * alfa)  # Factor de aumento por pendiente
                     modulo_pendiente_a_viento = math.log(factor_pendiente) / 0.069  # Convertir de nuevo a alfa para el cálculo del viento
+                    x_viento, y_viento = x_viento/math.sqrt(x_viento**2 + y_viento**2), y_viento/math.sqrt(x_viento**2 + y_viento**2)  # Normalizar dirección del viento
                     if ni == 0 or nj == 0:
                         x_p, y_p = ni * modulo_pendiente_a_viento, nj * modulo_pendiente_a_viento
                     else: 
