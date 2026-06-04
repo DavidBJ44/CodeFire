@@ -150,7 +150,8 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
             # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
                 ni, nj = i + di, j + dj
-                ni, nj = ni/math.sqrt(ni**2 + nj**2), nj/math.sqrt(ni**2 + nj**2)  # Normalizar dirección
+                nni = ni/math.sqrt(ni**2 + nj**2)
+                nnj = nj/math.sqrt(ni**2 + nj**2)
                 pendiente_negativa = 0
                 # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
@@ -165,11 +166,11 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     factor_pendiente = math.exp(0.069 * alfa)  # Factor de aumento por pendiente
                     modulo_pendiente_a_viento = math.log(factor_pendiente) / 0.069  # Convertir de nuevo a alfa para el cálculo del viento
                     x_viento, y_viento = x_viento/math.sqrt(x_viento**2 + y_viento**2), y_viento/math.sqrt(x_viento**2 + y_viento**2)  # Normalizar dirección del viento
-                    if ni == 0 or nj == 0:
-                        x_p, y_p = ni * modulo_pendiente_a_viento, nj * modulo_pendiente_a_viento
+                    if nni == 0 or nnj == 0:
+                        x_p, y_p = nni * modulo_pendiente_a_viento, nnj * modulo_pendiente_a_viento
                     else: 
-                        x_p = modulo_pendiente_a_viento / (math.sqrt(1 + ((nj / ni) ** 2)))
-                        y_p = (nj / ni) * x
+                        x_p = modulo_pendiente_a_viento / (math.sqrt(1 + ((nnj / nni) ** 2)))
+                        y_p = (nnj / nni) * x
                     if x_viento == 0 or y_viento == 0:
                         x_v, y_v = x_viento * velocidad_viento, y_viento * velocidad_viento
                     else:
@@ -180,7 +181,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     x, y = x_p + x_v, y_p + y_v
                     modulo_viento_total = math.sqrt(x**2 + y**2)
                     factor_final = math.exp(0.05039 * modulo_viento_total)
-                    cos_a = (x * ni + y * nj) / (modulo_viento_total * 1)
+                    cos_a = (x * nni + y * nnj) / (modulo_viento_total * 1)
                     multiplicador_viento = factor_final ** cos_a
 
                     potencial_efectivo = p_emisor * multiplicador_viento
