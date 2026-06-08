@@ -4,7 +4,7 @@ import math
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
 def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento, x_viento, y_viento):
-        # --- 1. LEER Y CARGAR LAS 4 MATRICES ---
+       # --- 1. LEER Y CARGAR LAS 4 MATRICES ---
     try:
         with open(nombre_archivo_entrada, 'r') as f:
             bloques = f.read().strip().split('\n\n')
@@ -100,8 +100,7 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
     
     # Direcciones y sus distancias (para diagonales usamos la hipotenusa)
     direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-    distancias = [cell_size, cell_size, cell_size, cell_size, cell_size, cell_size, cell_size, cell_size]
-    
+    distancias = [cell_size, cell_size, cell_size, cell_size, math.sqrt(2 * (cell_size)**2), math.sqrt(2 * (cell_size)**2), math.sqrt(2 * (cell_size)**2), math.sqrt(2 * (cell_size)**2)]         
     
     x = int(input(f"¿En qué fila quieres que empiece el fuego? (0-{n-1}): "))
     y = int(input(f"¿En qué columna quieres que empiece el fuego? (0-{m-1}): "))
@@ -150,8 +149,8 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
             # 2. Afectar a las colindantes
             for (di, dj), dist in zip(direcciones, distancias):
                 ni, nj = i + di, j + dj
-                nni = ni/math.sqrt((ni)**2 + (nj)**2)
-                nnj = nj/math.sqrt((ni)**2 + (nj)**2)
+                ddi = di/math.sqrt((di)**2 + (dj)**2)
+                ddj = dj/math.sqrt((di)**2 + (dj)**2)
                 pendiente_negativa = 0
                 # Celdas que pueden recibir daño
                 if 0 <= ni < n and 0 <= nj < m and A_terreno[ni, nj] not in ['f', '1', '0', '91', '92', '93', '94', '95', '96', '97', '98', '99']:
@@ -165,25 +164,34 @@ def avance_fuego(nombre_archivo_entrada, nombre_archivo_salida, velocidad_viento
                     alfa = math.atan(tan_alfa) * 180 / np.pi  # Ángulo de la pendiente en grados
                     factor_pendiente = math.exp(0.069 * alfa)  # Factor de aumento por pendiente
                     modulo_pendiente_a_viento = math.log(factor_pendiente) / 0.069  # Convertir de nuevo a alfa para el cálculo del viento
-                    x_viento, y_viento = x_viento/math.sqrt(x_viento**2 + y_viento**2), y_viento/math.sqrt(x_viento**2 + y_viento**2)  # Normalizar dirección del viento
-                    if nni == 0 or nnj == 0:
-                        x_p, y_p = nni * modulo_pendiente_a_viento, nnj * modulo_pendiente_a_viento
-                    else: 
-                        x_p = modulo_pendiente_a_viento / (math.sqrt(1 + ((nnj / nni) ** 2)))
-                        y_p = (nnj / nni) * x
-                    if x_viento == 0 or y_viento == 0:
-                        x_v, y_v = x_viento * velocidad_viento, y_viento * velocidad_viento
+                    # --- Cambio en la normalización del viento ---
+                    mag_v = math.sqrt(x_viento**2 + y_viento**2)
+                    if mag_v > 0:
+                        # y_viento (vertical) afecta a las filas (i). 
+                        # Usamos negativo porque subir en el mapa es restar filas.
+                        x_vi = -y_viento / mag_v 
+                        # x_viento (horizontal) afecta a las columnas (j).
+                        y_vi = x_viento / mag_v
                     else:
-                        x_v = velocidad_viento / (math.sqrt(1 + ((y_viento / x_viento) ** 2)))
-                        y_v = (y_viento / x_viento) * velocidad_viento
+                        x_vi, y_vi = 0, 0
+
+                    x_p, y_p = ddi * modulo_pendiente_a_viento, ddj * modulo_pendiente_a_viento
+                    x_v, y_v = x_vi * velocidad_viento, y_vi * velocidad_viento
+                    
                     if pendiente_negativa == 1:
                         x_p, y_p = -x_p, -y_p
                     x, y = x_p + x_v, y_p + y_v
                     modulo_viento_total = math.sqrt(x**2 + y**2)
-                    factor_final = math.exp(0.05039 * modulo_viento_total)
-                    cos_a = (x * nni + y * nnj) / (modulo_viento_total * 1)
-                    multiplicador_viento = factor_final ** cos_a
-
+                
+                    if modulo_viento_total > 0:
+                        factor_final = math.exp(0.05039 * modulo_viento_total)
+                        # Producto escalar entre (Fila, Col) del empuje y (Fila, Col) del vecino
+                        cos_a = (x * ddi + y * ddj) / modulo_viento_total
+                        # Limitamos cos_a entre -1 y 1 por errores de precisión
+                        cos_a = max(-1, min(1, cos_a))
+                        multiplicador_viento = factor_final ** cos_a
+                    else:
+                        multiplicador_viento = 1.0
                     potencial_efectivo = p_emisor * multiplicador_viento
                     # Restar a la resistencia de la casilla colindante
                     A_resistencias[ni, nj] -= potencial_efectivo
