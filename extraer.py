@@ -49,4 +49,4 @@ def ejecutar_proceso(archivo1, archivo2, salida_txt):
     print(f"\nLas matrices han sido guardadas en: {salida_txt}")
 
 # --- CONFIGURACIÓN ---
-ejecutar_proceso('mini_mapa_terr.asc', 'mini_mapa_alt.asc', 'matrices_solo.txt')
+ejecutar_proceso('recortes_suelo_ciudadB.asc', 'recortes_alt_ciudad.asc', 'matrices_ciudad.txt')

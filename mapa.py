@@ -6,7 +6,7 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 import re
 import os
 
-def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
+def generar_video_incendio(archivo_txt, nombre_salida, vel, wx=0, wy=0):
     # Asegurarnos de que el nombre tenga una extensión válida
     if not nombre_salida.endswith(('.mp4')):
         nombre_salida += ".mp4"
@@ -146,7 +146,7 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
                     ))
         
         # 4. Texto "Viento" en rojo y un poco más grande
-        ax.text(base_x, base_y - 0.08, 'Direcció Vent', 
+        ax.text(base_x, base_y - 0.08, f'Direcció Vent\n Velocitat: {vel}km/h',
                 transform=ax.transAxes, 
                 color='red', 
                 fontsize=12, 
@@ -185,5 +185,5 @@ def generar_video_incendio(archivo_txt, nombre_salida, wx=0, wy=0):
     ani.save(nombre_salida, writer=writer)
     print("¡Proceso finalizado con éxito!")
 #ejemplo uso 
-#generar_video_incendio('test_evolucion_fuego.txt','mat_text_out',1,1)viento_x = 1
+#generar_video_incendio('test_evolucion_fuego.txt','mat_text_out', 25,1,1)
     

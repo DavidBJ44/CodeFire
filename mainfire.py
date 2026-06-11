@@ -7,12 +7,12 @@ import pandas as pd
 
 def main():
     # --- CONFIGURACIÓN DE ARCHIVOS ---
-    archivo_inicial = 'matrices_sin_pendiente.txt'    # Suelo + Altitud
+    archivo_inicial = 'matrices_solo.txt'    # Suelo + Altitud
     archivo_7_matrices = 'test_7Matrices.txt'        # Suelo + Altitud + Ea + Pq
     archivo_evolucion = 'test_evolucion_fuego.txt' # Pasos del fuego
-    archivo_video = 'simulacion_incendio_xxxxxxxx'     # Nombre del video final (sin .mp4)
+    archivo_video = 'sim_in_primavera_vent_25'     # Nombre del video final (sin .mp4)
     velocidad_viento = 25 #km/h
-    viento_x = 1 
+    viento_x = 1
     viento_y = 1
     direccion_viento = (viento_x ,viento_y)
     temp_amb = 25.3#del dia q toca caluclar 
@@ -26,18 +26,18 @@ def main():
 
     
     # Generamos el diccionario { 'ID': [ea, pq] }
-    diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc.calcular_ffmc(matriz_ffmc), bui.calcular_bui(matriz_bui), temp_amb,m)
+   #diccionario_fuego = F_RP.generar_diccionario_fuego(ffmc.calcular_ffmc(matriz_ffmc), bui.calcular_bui(matriz_bui), temp_amb,m)
    # --- ESTIU (Catalunya, Risc Extrem - Pla Alfa 3) ---
-   #diccionario_fuego = F_RP.generar_diccionario_fuego(90.0, 90.0, 35.0, 0.5)
+    #diccionario_fuego = F_RP.generar_diccionario_fuego(90.0, 90.0, 35.0, 0.5)
 
 ## --- PRIMAVERA (Catalunya, Humitat variable) ---
-    #diccionario_fuego = F_RP.generar_diccionario_fuego(65.0, 50.0, 22.0, 0.75)
+    diccionario_fuego = F_RP.generar_diccionario_fuego(65.0, 50.0, 22.0, 0.75)
 #
 ## --- TARDOR (Catalunya, Post-estiu sec) ---
     #diccionario_fuego = F_RP.generar_diccionario_fuego(45.0, 45.0, 18.0, 0.55)
 #
 ## --- HIVERN (Catalunya, Fred i humit) ---
-   # diccionario_fuego = F_RP.generar_diccionario_fuego(20.0, 10.0, 9.0, 0.85)
+    #diccionario_fuego = F_RP.generar_diccionario_fuego(20.0, 10.0, 9.0, 0.85)
 
     # Generamos el archivo que combina las 4 matrices necesarias
     F_RP.Gen_e_q_m(archivo_inicial, archivo_7_matrices, diccionario_fuego)
@@ -51,7 +51,7 @@ def main():
     print("\n=== PASO 3: Generando Video ===")
     # wx, wy son la dirección del viento para la flecha visual
  
-    mapa.generar_video_incendio(archivo_evolucion, archivo_video, viento_x, viento_y)
+    mapa.generar_video_incendio(archivo_evolucion, archivo_video,velocidad_viento, viento_x, viento_y)
 
     print("\n==============================================")
     print(f"PROCESO FINALIZADO CON ÉXITO")
